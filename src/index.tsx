@@ -13,6 +13,7 @@ ReactDOM.render(
       <GlobalStyle />
       <SafeProvider
         loader={
+          // eslint-disable-next-line react/jsx-wrap-multilines
           <>
             <Title size="md">Waiting for Safe...</Title>
             <Loader size="md" />

@@ -1,11 +1,12 @@
 module.exports = {
-  webpack: function (config) {
+  webpack(config) {
     return config;
   },
-  jest: function (config) {
+  jest(config) {
     return config;
   },
-  devServer: function (configFunction) {
+  devServer(configFunction) {
+    // eslint-disable-next-line func-names
     return function (proxy, allowedHost) {
       const config = configFunction(proxy, allowedHost);
 
@@ -18,7 +19,7 @@ module.exports = {
       return config;
     };
   },
-  paths: function (paths) {
+  paths(paths) {
     return paths;
   },
 };

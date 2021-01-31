@@ -1,0 +1,4 @@
+{
+    "extends": "./tsconfig.json",
+    "include": ["config-overrides.js", "src/**/*", "src/*.tsx", "src/*.ts"]
+}
