@@ -20,7 +20,8 @@ export const CardStyled = styled(Card)`
   justify-content: space-around;
   align-items: center;
   height: 150px;
-  margin-top: 20px;
+  margin-top: 40px;
+  margin-bottom: 40px;
   max-width: 750px;
   min-width: 300px;
   margin-left: auto;
@@ -29,6 +30,16 @@ export const CardStyled = styled(Card)`
 `;
 
 export const Column = styled.div`
+  align-self: flex-start;
+  margin-left: 2.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: space-around;
+`;
+
+export const CountdownColumn = styled.div`
   align-self: flex-start;
   margin-left: 2.5%;
   display: flex;
@@ -50,7 +61,7 @@ export const CardHeading = styled.h4`
 
 export const PrizeText = styled.h1`
   font-family: Averta, Roboto;
-  font-size: 4rem;
+  font-size: 3.5rem;
   margin: 0;
   ${media.lessThan('medium')`
     font-size: 3rem;
@@ -80,6 +91,8 @@ export const LeftColumn = styled.div`
 
 export const BalanceText = styled.div`
   width: 100%;
+  height: 50px;
+  flex: 1;
   font-size: ${(props: { fontSize: string; ref: React.MutableRefObject<HTMLDivElement> }) => props.fontSize || '100%'};
 `;
 

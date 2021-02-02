@@ -11,40 +11,58 @@ import {
   CountdownText,
   BalanceText,
   PrizeTextContainer,
+  CountdownColumn,
 } from './styled';
+import PoolCardProps from './PoolCardProps';
 
-const PoolCard: React.FC = () => {
+const PoolCard: React.FC<PoolCardProps> = (props) => {
   const { fontSize, ref } = useFitText({
     minFontSize: 20,
-    maxFontSize: 200,
+    maxFontSize: 150,
     resolution: 5,
   });
 
   return (
     <CardStyled>
       <LeftColumn>
-        <CoinImage src="https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg" />
+        <CoinImage src={props.tokenImageUrl} />
         <Divider />
         <span style={{ marginLeft: 'auto', marginRight: 'auto' }}>
-          <Text size="sm">Current Balance</Text>
+          <Text size="sm">Current Tickets</Text>
         </span>
         <BalanceText ref={ref} fontSize={fontSize}>
-          $0.00
+          {props.userBalance}
         </BalanceText>
       </LeftColumn>
       <Column>
         <CardHeading>Prize Value</CardHeading>
         <PrizeTextContainer>
-          <PrizeText>$3,035</PrizeText>
+          <PrizeText>${props.prizeValue}</PrizeText>
         </PrizeTextContainer>
       </Column>
-      <Column>
+      <CountdownColumn>
         <CardHeading>Countdown</CardHeading>
-        <CountdownText>0 days 4 hours 7 minutes</CountdownText>
-        <Button size="lg" color="primary" variant="contained">
-          Deposit DAI
-        </Button>
-      </Column>
+        <CountdownText>
+          {props.countdown.days} days {props.countdown.hours} hours {props.countdown.minutes} minutes
+        </CountdownText>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          {props.userBalance === '0.00' && (
+            <Button size="lg" color="primary" variant="contained">
+              Deposit {props.tokenSymbol}
+            </Button>
+          )}
+          {!(props.userBalance === '0.00') && (
+            <div style={{ display: 'flex', height: '80px', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <Button size="md" color="primary" variant="contained">
+                Deposit {props.tokenSymbol}
+              </Button>
+              <Button size="md" color="secondary" variant="contained">
+                Withdraw {props.tokenSymbol}
+              </Button>
+            </div>
+          )}
+        </div>
+      </CountdownColumn>
     </CardStyled>
   );
 };
