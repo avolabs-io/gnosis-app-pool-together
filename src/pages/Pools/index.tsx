@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
+import { GetPools } from '../../ptGraphClient';
 
 const cards: PoolCardProps[] = [
   {
@@ -38,12 +39,22 @@ const cards: PoolCardProps[] = [
   },
 ];
 
-const Pools: React.FC = () => (
-  <>
-    {cards.map((val) => (
-      <PoolCard key={val.prizeValue} {...val} />
-    ))}
-  </>
-);
+const Pools: React.FC = () => {
+  useEffect(() => {
+    console.log('This is called');
+    (async () => {
+      const value = await GetPools();
+      console.log(value);
+    })();
+  }, []);
+
+  return (
+    <>
+      {cards.map((val) => (
+        <PoolCard key={val.prizeValue} {...val} />
+      ))}
+    </>
+  );
+};
 
 export default Pools;

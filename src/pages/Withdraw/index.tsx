@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Title, Divider, Select, TextField, Text, Button } from '@gnosis.pm/safe-react-components';
 import {
   Heading,
@@ -11,6 +11,11 @@ import {
 import { SelectItem } from '../../types';
 import { Link } from './styled';
 
+// import { contractAddresses } from '@pooltogether/current-pool-data';
+import { ethers } from 'ethers';
+import { daiAbi } from '../../abis/dai';
+import { daiPoolAbi } from '../../abis/daiPool';
+
 const withdrawSelectItems: Array<SelectItem> = [
   {
     id: '1',
@@ -22,10 +27,38 @@ const withdrawSelectItems: Array<SelectItem> = [
   { id: '3', label: 'without icon' },
 ];
 
+declare const window: any;
+
 const Withdraw: React.FC = () => {
   const [activeItemId, setActiveItemId] = useState('1');
 
   const [hasFairnessFee, setHasFairnessFee] = useState(false);
+
+  useEffect(() => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
+    const daiPoolAddress = '0x4706856FA8Bb747D50b4EF8547FE51Ab5Edc4Ac2';
+    // const daiPoolAddress = contractAddresses[CHAIN_ID].dai.prizePool; //TODO improvement add typescript declerations
+    const daiPoolContract = new ethers.Contract(daiPoolAddress, daiPoolAbi, provider);
+
+    const daiPoolWithSigner = daiPoolContract.connect(signer);
+
+    daiPoolWithSigner.liquidityCap().then((res: BigInt) => console.log(res.toString()));
+
+    // const daiAddress = '0x04bbc998daa6eb57cf5a845805312102799a1963';
+
+    // const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
+
+    // console.log(daiContract.name());
+
+    // const dai = ethers.utils.parseUnits('1.0', 18);
+
+    // const tx = daiWithSigner.transfer('0xD2532adf827b0341031CB3C96927024C23cCE9eE', dai);
+
+    // console.log(tx);
+    // console.log(provider);
+  }, []);
 
   return (
     <Wrapper>
@@ -58,7 +91,9 @@ const Withdraw: React.FC = () => {
         id="standard-name"
         label="Amount"
         value=""
-        onChange={() => {}}
+        onChange={() => {
+          () => console.log('i changed');
+        }}
         endAdornment={
           <Button color="secondary" size="md">
             <Heading>MAX</Heading>
