@@ -49,16 +49,6 @@ export const CountdownColumn = styled.div`
   justify-content: space-around;
 `;
 
-export const CardHeading = styled.h4`
-  font-size: 1rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin: 0 0 auto 0;
-  ${media.lessThan('small')`
-  font-size:0.8rem;
-  `}
-`;
-
 export const PrizeText = styled.h1`
   font-family: Averta, Roboto;
   font-size: 3.5rem;

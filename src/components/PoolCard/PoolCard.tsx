@@ -5,7 +5,6 @@ import {
   CoinImage,
   CardStyled,
   Column,
-  CardHeading,
   PrizeText,
   LeftColumn,
   CountdownText,
@@ -14,6 +13,8 @@ import {
   CountdownColumn,
 } from './styled';
 import PoolCardProps from './PoolCardProps';
+
+import { Heading } from '../GeneralStyled';
 
 const PoolCard: React.FC<PoolCardProps> = (props) => {
   const { fontSize, ref } = useFitText({
@@ -35,32 +36,20 @@ const PoolCard: React.FC<PoolCardProps> = (props) => {
         </BalanceText>
       </LeftColumn>
       <Column>
-        <CardHeading>Prize Value</CardHeading>
+        <Heading>Prize Value</Heading>
         <PrizeTextContainer>
           <PrizeText>${props.prizeValue}</PrizeText>
         </PrizeTextContainer>
       </Column>
       <CountdownColumn>
-        <CardHeading>Countdown</CardHeading>
+        <Heading>Countdown</Heading>
         <CountdownText>
           {props.countdown.days} days {props.countdown.hours} hours {props.countdown.minutes} minutes
         </CountdownText>
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          {props.userBalance === '0.00' && (
-            <Button size="lg" color="primary" variant="contained">
-              Deposit {props.tokenSymbol}
-            </Button>
-          )}
-          {!(props.userBalance === '0.00') && (
-            <div style={{ display: 'flex', height: '80px', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <Button size="md" color="primary" variant="contained">
-                Deposit {props.tokenSymbol}
-              </Button>
-              <Button size="md" color="secondary" variant="contained">
-                Withdraw {props.tokenSymbol}
-              </Button>
-            </div>
-          )}
+          <Button size="lg" color="primary" variant="contained">
+            Deposit {props.tokenSymbol}
+          </Button>
         </div>
       </CountdownColumn>
     </CardStyled>
