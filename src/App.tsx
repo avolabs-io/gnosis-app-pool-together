@@ -1,22 +1,33 @@
 import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
-import { Button, Loader, Title } from '@gnosis.pm/safe-react-components';
+import { Tab } from '@gnosis.pm/safe-react-components';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { Pools, Deposit, Withdraw } from './pages';
+import { TabItem } from './types';
 
-const Container = styled.form`
-  margin-bottom: 2rem;
-  width: 100%;
-  max-width: 480px;
-
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-column-gap: 1rem;
-  grid-row-gap: 1rem;
-`;
-
+const pageTabItems: TabItem[] = [
+  {
+    id: '0',
+    icon: 'rocket',
+    label: 'Pools',
+  },
+  {
+    id: '1',
+    icon: 'received',
+    label: 'Deposit',
+  },
+  {
+    id: '2',
+    icon: 'sent',
+    label: 'Withdraw',
+  },
+];
 const App: React.FC = () => {
   const { sdk, safe } = useSafeAppsSDK();
   const [submitting, setSubmitting] = useState(false);
+
+  const [selected, setSelected] = useState<string>('0');
+
+  const [activeItemId, setActiveItemId] = useState('1');
 
   const submitTx = useCallback(async () => {
     setSubmitting(true);
@@ -40,28 +51,12 @@ const App: React.FC = () => {
   }, [safe, sdk]);
 
   return (
-    <Container>
-      <Title size="md">{safe.safeAddress}</Title>
-      {submitting ? (
-        <>
-          <Loader size="md" />
-          <br />
-          <Button
-            size="lg"
-            color="secondary"
-            onClick={() => {
-              setSubmitting(false);
-            }}
-          >
-            Cancel
-          </Button>
-        </>
-      ) : (
-        <Button size="lg" color="primary" onClick={submitTx}>
-          Submit
-        </Button>
-      )}
-    </Container>
+    <>
+      <Tab selectedTab={selected} variant="outlined" items={pageTabItems} onChange={(x) => setSelected(x)} fullWidth />
+      {selected === '0' && <Pools />}
+      {selected === '1' && <Deposit />}
+      {selected === '2' && <Withdraw />}
+    </>
   );
 };
 

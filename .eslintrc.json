@@ -1,0 +1,30 @@
+{
+    "parser": "@typescript-eslint/parser", 
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "project": "./tsconfig.eslint.json"
+    },
+    "settings": {
+        "react": {
+            "version": "detect" 
+        }
+    },
+    "extends": [
+        "airbnb-typescript",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:prettier/recommended",
+        "prettier/@typescript-eslint"
+    ],
+    "rules": {
+        // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
+        // e.g. "@typescript-eslint/explicit-function-return-type": "off",
+        "react/jsx-wrap-multilines": ["error", {"declaration": false, "assignment": false}],
+        "react/prop-types": "off",
+        "react/destructuring-assignment": "off",
+        "react/jsx-one-expression-per-line": "off",
+        "react/jsx-props-no-spreading": "off"
+    }
+}
