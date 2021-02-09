@@ -4,10 +4,10 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 import { POOLS_QUERY, POOLS_BY_ID } from './queries';
 
-export const POOLTOGETHER_GRAPH_ENDPOINT =
-  'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
+export const POOLTOGETHER_GRAPH_ENDPOINT ='https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
+ // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
-// https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0
+
 const ptClient = new ApolloClient({
   link: new HttpLink({ uri: POOLTOGETHER_GRAPH_ENDPOINT, fetch }),
   cache: new InMemoryCache(),

@@ -1749,23 +1749,15 @@
     "@ethersproject/providers" "^5.0.19"
     "@gnosis.pm/safe-apps-sdk" "^1.1.0"
 
-"@gnosis.pm/safe-apps-react-sdk@1.0.0-beta.1":
-  version "1.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-react-sdk/-/safe-apps-react-sdk-1.0.0-beta.1.tgz#f6f6cc9116f7607950b7a183b7babd29be3880d1"
-  integrity sha512-4PyW4zRa8Su6giJOZA+5rRrx2jPuZ/0XIz4xV4Mp8wVyS3BYACejQm0Zcwy8a6QgApwJZHU1IhqrdNM5vWnHQQ==
+"@gnosis.pm/safe-apps-react-sdk@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-react-sdk/-/safe-apps-react-sdk-1.1.0.tgz#5877d02824e63940046549f215bf193b0ad3e817"
+  integrity sha512-L05ttyAyB0VbWWzPgCI65V+BfPspu2bGGlN/YBOfrEnm6U2n7zVQjpfnsB8OW0gee3dgQEzueFDhYaamzCMKCQ==
   dependencies:
-    "@gnosis.pm/safe-apps-sdk" "1.0.0-beta.5"
-    "@types/jest" "^26.0.19"
+    "@gnosis.pm/safe-apps-sdk" "1.1.0"
+    "@types/jest" "^26.0.20"
 
-"@gnosis.pm/safe-apps-sdk@1.0.0-beta.5":
-  version "1.0.0-beta.5"
-  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-1.0.0-beta.5.tgz#3dbd901c222b3ff2173e21f7daea92d8e88cf4b1"
-  integrity sha512-Cp2QPXaWEKi0ZVXSxWWv4eEF/PBRIbqFJitnkvTOtpSPV4ES3ftzzsv4lRIS5o1i6xuMOZej89an+XRxwC3+Gw==
-  dependencies:
-    semver "^7.3.2"
-    web3-core "^1.3.0"
-
-"@gnosis.pm/safe-apps-sdk@^1.1.0":
+"@gnosis.pm/safe-apps-sdk@1.1.0", "@gnosis.pm/safe-apps-sdk@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-sdk/-/safe-apps-sdk-1.1.0.tgz#9a483bf95bf01603679e8dc2ebd276a2e83d0d0a"
   integrity sha512-HNEFRtdGtwvmiQMxGC6BZ742wnnelmh0OFRf9ZWFylvnnymJ+otiEQtT/c+WhFvqQR+QJpvZJDrPGyO4R+y8iw==
@@ -2428,7 +2420,7 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
-"@types/jest@*", "@types/jest@^26.0.10", "@types/jest@^26.0.19":
+"@types/jest@*", "@types/jest@^26.0.10", "@types/jest@^26.0.20":
   version "26.0.20"
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-26.0.20.tgz#cd2f2702ecf69e86b586e1f5223a60e454056307"
   integrity sha512-9zi2Y+5USJRxd0FsahERhBwlcvFh6D2GLQnY2FH2BzK8J9s9omvNHIbvABwIluXa0fD8XVKMLTO0aOEuUfACAA==
