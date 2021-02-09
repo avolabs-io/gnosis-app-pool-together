@@ -6,6 +6,19 @@ export const POOLS_QUERY = gql`
       id
       deactivated
       underlyingCollateralName
+      cumulativePrizeNet
+    }
+  }
+`;
+
+export const POOLS_BY_ID = gql`
+  query GetPoolsById($poolAddresses: [String!]!) {
+    prizePools(where: { id_in: $poolAddresses }) {
+      id
+      deactivated
+      underlyingCollateralSymbol
+      cumulativePrizeNet
+      underlyingCollateralToken
     }
   }
 `;

@@ -48,7 +48,6 @@ const Deposit: React.FC = () => {
         id="standard-name"
         label="Amount"
         value=""
-        onChange={() => {}}
         endAdornment={
           <Button color="secondary" size="md">
             <Heading>MAX</Heading>

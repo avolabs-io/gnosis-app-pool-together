@@ -1,6 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { contractAddresses } from '@pooltogether/current-pool-data';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
-import { GetPools } from '../../ptGraphClient';
+import { GetPools, GetPoolsById } from '../../ptGraphClient';
+import { ethers } from 'ethers';
 
 const cards: PoolCardProps[] = [
   {
@@ -40,18 +43,40 @@ const cards: PoolCardProps[] = [
 ];
 
 const Pools: React.FC = () => {
+  const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
   useEffect(() => {
     console.log('This is called');
+    const pools = Object.keys(contractAddresses['1'])
+      .filter((x) => !!contractAddresses['1'][x].prizePool)
+      .map((x) => contractAddresses['1'][x].prizePool.toLowerCase());
     (async () => {
-      const value = await GetPools();
-      console.log(value);
+      const value: {
+        prizePools: [
+          {
+            underlyingCollateralSymbol: string;
+            underlyingCollateralToken: string;
+          },
+        ];
+      } = await GetPoolsById(pools);
+      const p: PoolCardProps[] = value.prizePools.map((x) => ({
+        tokenImageUrl:  ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
+        tokenSymbol:x.underlyingCollateralSymbol.toString(),
+        userBalance: '0.0',
+        prizeValue: '1000',
+        countdown: {
+          days: 0,
+          hours: 10,
+          minutes: 8,
+        },
+      }));
+      setPrizePools(p);
     })();
   }, []);
 
   return (
     <>
-      {cards.map((val) => (
-        <PoolCard key={val.prizeValue} {...val} />
+      {prizePools.map((val) => (
+        <PoolCard key={val.tokenSymbol} {...val} />
       ))}
     </>
   );

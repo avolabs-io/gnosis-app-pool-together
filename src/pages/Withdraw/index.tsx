@@ -13,6 +13,8 @@ import { Link } from './styled';
 
 // import { contractAddresses } from '@pooltogether/current-pool-data';
 import { ethers } from 'ethers';
+import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { SafeAppsSdkProvider } from '@gnosis.pm/safe-apps-ethers-provider';
 import { daiAbi } from '../../abis/dai';
 import { daiPoolAbi } from '../../abis/daiPool';
 
