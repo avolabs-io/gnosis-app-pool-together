@@ -8,6 +8,7 @@ type PoolCardProps = {
     hours: number;
     minutes: number;
   };
+  prizeGivingTimestamp: string;
 };
 
 export default PoolCardProps;

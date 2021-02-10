@@ -7,6 +7,9 @@ export const POOLS_QUERY = gql`
       deactivated
       underlyingCollateralName
       cumulativePrizeNet
+      prizes {
+        prizePeriodStartedTimestamp
+      }
     }
   }
 `;
@@ -19,6 +22,7 @@ export const POOLS_BY_ID = gql`
       underlyingCollateralSymbol
       cumulativePrizeNet
       underlyingCollateralToken
+      maxTimelockDuration
     }
   }
 `;

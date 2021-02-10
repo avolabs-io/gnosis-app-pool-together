@@ -16,6 +16,7 @@ const cards: PoolCardProps[] = [
       hours: 3,
       minutes: 7,
     },
+    prizeGivingTimestamp: '1',
   },
   {
     tokenImageUrl: 'https://app.pooltogether.com/_next/static/images/token-uni-451e466d1b684adf13ce4990aee5b04b.png',
@@ -27,6 +28,7 @@ const cards: PoolCardProps[] = [
       hours: 3,
       minutes: 7,
     },
+    prizeGivingTimestamp: '2',
   },
   {
     tokenImageUrl:
@@ -39,6 +41,7 @@ const cards: PoolCardProps[] = [
       hours: 10,
       minutes: 8,
     },
+    prizeGivingTimestamp: '3',
   },
 ];
 
@@ -55,12 +58,13 @@ const Pools: React.FC = () => {
           {
             underlyingCollateralSymbol: string;
             underlyingCollateralToken: string;
+            maxTimelockDuration: string;
           },
         ];
       } = await GetPoolsById(pools);
       const p: PoolCardProps[] = value.prizePools.map((x) => ({
-        tokenImageUrl:  ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
-        tokenSymbol:x.underlyingCollateralSymbol.toString(),
+        tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
+        tokenSymbol: x.underlyingCollateralSymbol.toString(),
         userBalance: '0.0',
         prizeValue: '1000',
         countdown: {
@@ -68,7 +72,9 @@ const Pools: React.FC = () => {
           hours: 10,
           minutes: 8,
         },
+        prizeGivingTimestamp: x.maxTimelockDuration,
       }));
+
       setPrizePools(p);
     })();
   }, []);

@@ -85,12 +85,3 @@ export const BalanceText = styled.div`
   flex: 1;
   font-size: ${(props: { fontSize: string; ref: React.MutableRefObject<HTMLDivElement> }) => props.fontSize || '100%'};
 `;
-
-export const CountdownText = styled.div`
-  letter-spacing: 1px;
-  margin-bottom: auto;
-  text-align: center;
-  ${media.lessThan('small')`
-  font-size: 14px;
-`}
-`;
