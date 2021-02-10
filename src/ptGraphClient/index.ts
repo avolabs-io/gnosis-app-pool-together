@@ -39,6 +39,10 @@ export const GetPoolsById = async (ids: string[]) => {
         poolAddresses: ids,
       },
     });
+
+    console.log('get pools by ID');
+    console.log(data);
+
     return data;
   } catch (error) {
     console.log('error');
@@ -52,6 +56,7 @@ type PrizeStrategy =
   | undefined
   | {
       id: string;
+      prizePeriodEndAt: string;
       ticket: {
         id: string;
         totalSupply: string;

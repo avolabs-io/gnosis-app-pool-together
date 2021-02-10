@@ -7,25 +7,29 @@ import {
   Column,
   PrizeText,
   LeftColumn,
-  CountdownText,
   BalanceText,
   PrizeTextContainer,
   CountdownColumn,
 } from './styled';
 import PoolCardProps from './PoolCardProps';
+import Countdown from '../Countdown';
 
 import { Heading } from '../GeneralStyled';
 
-const PoolCard: React.FC<PoolCardProps> = (props) => {
+const PoolCard: React.FC<PoolCardProps> = ({
+  tokenImageUrl,
+  userBalance,
+  prizeValue,
+  secondsRemaining,
+  tokenSymbol,
+}: PoolCardProps) => {
   const { fontSize, ref } = useFitText({
     minFontSize: 20,
     maxFontSize: 150,
     resolution: 5,
   });
 
-  const [imageUrl, setImageUrl] = useState(
-    `https://gnosis-safe-token-logos.s3.amazonaws.com/${props.tokenImageUrl}.png`,
-  );
+  const [imageUrl, setImageUrl] = useState(`https://gnosis-safe-token-logos.s3.amazonaws.com/${tokenImageUrl}.png`);
 
   return (
     <CardStyled>
@@ -43,23 +47,21 @@ const PoolCard: React.FC<PoolCardProps> = (props) => {
           <Text size="sm">Current Tickets</Text>
         </span>
         <BalanceText ref={ref} fontSize={fontSize}>
-          {props.userBalance}
+          {userBalance}
         </BalanceText>
       </LeftColumn>
       <Column>
         <Heading>Prize Value</Heading>
         <PrizeTextContainer>
-          <PrizeText>${props.prizeValue}</PrizeText>
+          <PrizeText>${prizeValue}</PrizeText>
         </PrizeTextContainer>
       </Column>
       <CountdownColumn>
         <Heading>Countdown</Heading>
-        <CountdownText>
-          {props.countdown.days} days {props.countdown.hours} hours {props.countdown.minutes} minutes
-        </CountdownText>
+        <Countdown prizeGivingSecondsRemaining={secondsRemaining} />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <Button size="lg" color="primary" variant="contained">
-            Deposit {props.tokenSymbol}
+            Deposit {tokenSymbol}
           </Button>
         </div>
       </CountdownColumn>

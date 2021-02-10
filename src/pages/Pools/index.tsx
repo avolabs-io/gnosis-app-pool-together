@@ -23,9 +23,28 @@ const Pools: React.FC = () => {
           hours: 10,
           minutes: 8,
         },
-        secondsRemaining: poolChainData.length < pools.length ? 0 : poolChainData[index].secondsRemaining,
+        secondsRemaining: (x.poolGraphData.prizeStrategy.multipleWinners != null
+          ? x.poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
+          : x.poolGraphData.prizeStrategy.singleRandomWinner
+          ? x.poolGraphData.prizeStrategy.singleRandomWinner.prizePeriodEndAt
+          : Date.now()) as number,
       })),
     );
+
+    if (pools.length > 0) {
+      console.log(
+        pools[0].poolGraphData.prizeStrategy.multipleWinners != null
+          ? pools[0].poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
+          : pools[0].poolGraphData.prizeStrategy.singleRandomWinner
+          ? pools[0].poolGraphData.prizeStrategy.singleRandomWinner.prizePeriodEndAt
+          : Date.now(),
+      );
+    }
+
+    if (pools.length > 0) {
+      console.log('poolChainData');
+      console.log(pools[0].prizeStrategyContract);
+    }
   }, [JSON.stringify(pools), JSON.stringify(controlledTokenBalances), JSON.stringify(poolChainData)]);
 
   return (

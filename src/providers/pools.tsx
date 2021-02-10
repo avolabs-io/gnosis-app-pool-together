@@ -23,6 +23,7 @@ type PoolData = {
   cTokenContract: null | ethers.Contract;
   ticketContract: ethers.Contract;
   sponsorshipContract: ethers.Contract;
+  poolGraphData: PoolGraphData;
 };
 
 export const PoolsProvider: React.FC = ({ children }) => {
@@ -34,6 +35,10 @@ export const PoolsProvider: React.FC = ({ children }) => {
       const network = await provider.getNetwork();
       const addresses = contractAddresses[network.chainId.toString()];
       console.log(network.chainId.toString());
+
+      console.log('Object.keys(addresses)');
+      console.log(Object.keys(addresses));
+
       const poolAddresses = Object.keys(addresses)
         .filter((x) => !!addresses[x].prizePool)
         .map((x) => addresses[x].prizePool.toLowerCase());
@@ -54,6 +59,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
           cTokenContract: getCTokenContract(result, provider),
           sponsorshipContract: sponsorship,
           ticketContract: ticket,
+          poolGraphData: result,
         };
       });
 

@@ -7,6 +7,9 @@ export const POOLS_QUERY = gql`
       deactivated
       underlyingCollateralName
       cumulativePrizeNet
+      prizes {
+        prizePeriodStartedTimestamp
+      }
     }
   }
 `;
@@ -22,6 +25,7 @@ export const POOLS_BY_ID = gql`
       prizeStrategy {
         singleRandomWinner {
           id
+          prizePeriodEndAt
           sponsorship {
             id
             totalSupply
@@ -32,6 +36,7 @@ export const POOLS_BY_ID = gql`
           }
         }
         multipleWinners {
+          prizePeriodEndAt
           id
           sponsorship {
             id
