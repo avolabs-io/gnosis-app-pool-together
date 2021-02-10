@@ -4,6 +4,9 @@ import { ThemeProvider } from 'styled-components';
 import { theme, Loader, Title } from '@gnosis.pm/safe-react-components';
 import SafeProvider from '@gnosis.pm/safe-apps-react-sdk';
 
+import { EthersProvider } from './providers/ethers';
+import { PoolsProvider } from './providers/pools';
+
 import GlobalStyle from './GlobalStyle';
 import App from './App';
 
@@ -20,7 +23,11 @@ ReactDOM.render(
           </>
         }
       >
-        <App />
+        <EthersProvider>
+          <PoolsProvider>
+            <App />
+          </PoolsProvider>
+        </EthersProvider>
       </SafeProvider>
     </ThemeProvider>
   </React.StrictMode>,
