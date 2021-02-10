@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Text, Button, Divider } from '@gnosis.pm/safe-react-components';
 import useFitText from 'use-fit-text';
 import {
@@ -23,7 +23,9 @@ const PoolCard: React.FC<PoolCardProps> = (props) => {
     resolution: 5,
   });
 
-  const [imageUrl, setImageUrl] = useState(`https://gnosis-safe-token-logos.s3.amazonaws.com/${props.tokenImageUrl}.png`);
+  const [imageUrl, setImageUrl] = useState(
+    `https://gnosis-safe-token-logos.s3.amazonaws.com/${props.tokenImageUrl}.png`,
+  );
 
   return (
     <CardStyled>
@@ -31,7 +33,9 @@ const PoolCard: React.FC<PoolCardProps> = (props) => {
         <CoinImage
           src={imageUrl}
           onError={() => {
-            setImageUrl('https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg');
+            setImageUrl(
+              'https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg',
+            );
           }}
         />
         <Divider />

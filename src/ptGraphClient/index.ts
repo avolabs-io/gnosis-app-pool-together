@@ -4,8 +4,8 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 import { POOLS_QUERY, POOLS_BY_ID } from './queries';
 
-export const POOLTOGETHER_GRAPH_ENDPOINT ='https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
- // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
+export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
+// 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 
 const ptClient = new ApolloClient({
@@ -45,6 +45,39 @@ export const GetPoolsById = async (ids: string[]) => {
     console.log(error);
     return { error: true, message: error };
   }
+};
+
+type PrizeStrategy =
+  | null
+  | undefined
+  | {
+      id: string;
+      ticket: {
+        id: string;
+        totalSupply: string;
+      };
+      sponsorship: {
+        id: string;
+        totalSupply: string;
+      };
+    };
+
+type CompoundPrizePool =
+  | null
+  | undefined
+  | {
+      cToken: string;
+    };
+
+export type PoolGraphData = {
+  underlyingCollateralSymbol: string;
+  underlyingCollateralToken: string;
+  compoundPrizePool: CompoundPrizePool;
+  id: string;
+  prizeStrategy: {
+    singleRandomWinner: PrizeStrategy;
+    multipleWinners: PrizeStrategy;
+  };
 };
 
 // export const GetExampleQuery = async (userAddress) => {

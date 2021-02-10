@@ -23,11 +23,11 @@ ReactDOM.render(
           </>
         }
       >
-      <EthersProvider>
-        <PoolsProvider>
-        <App />
-        </PoolsProvider>
-      </EthersProvider>
+        <EthersProvider>
+          <PoolsProvider>
+            <App />
+          </PoolsProvider>
+        </EthersProvider>
       </SafeProvider>
     </ThemeProvider>
   </React.StrictMode>,
