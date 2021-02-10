@@ -13,16 +13,41 @@ export const POOLS_QUERY = gql`
     }
   }
 `;
-
 export const POOLS_BY_ID = gql`
   query GetPoolsById($poolAddresses: [String!]!) {
     prizePools(where: { id_in: $poolAddresses }) {
       id
-      deactivated
       underlyingCollateralSymbol
-      cumulativePrizeNet
       underlyingCollateralToken
-      maxTimelockDuration
+      compoundPrizePool {
+        cToken
+      }
+      prizeStrategy {
+        singleRandomWinner {
+          id
+          prizePeriodEndAt
+          sponsorship {
+            id
+            totalSupply
+          }
+          ticket {
+            id
+            totalSupply
+          }
+        }
+        multipleWinners {
+          prizePeriodEndAt
+          id
+          sponsorship {
+            id
+            totalSupply
+          }
+          ticket {
+            id
+            totalSupply
+          }
+        }
+      }
     }
   }
 `;

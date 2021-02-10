@@ -1,3 +1,3 @@
 export type Props = {
-  prizeGivingTimestamp: number;
+  prizeGivingSecondsRemaining: number;
 };

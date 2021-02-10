@@ -4,10 +4,10 @@ import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
 import { POOLS_QUERY, POOLS_BY_ID } from './queries';
 
-export const POOLTOGETHER_GRAPH_ENDPOINT =
-  'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
+export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
-// https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0
+// 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
+
 const ptClient = new ApolloClient({
   link: new HttpLink({ uri: POOLTOGETHER_GRAPH_ENDPOINT, fetch }),
   cache: new InMemoryCache(),
@@ -39,12 +39,50 @@ export const GetPoolsById = async (ids: string[]) => {
         poolAddresses: ids,
       },
     });
+
+    console.log('get pools by ID');
+    console.log(data);
+
     return data;
   } catch (error) {
     console.log('error');
     console.log(error);
     return { error: true, message: error };
   }
+};
+
+type PrizeStrategy =
+  | null
+  | undefined
+  | {
+      id: string;
+      prizePeriodEndAt: string;
+      ticket: {
+        id: string;
+        totalSupply: string;
+      };
+      sponsorship: {
+        id: string;
+        totalSupply: string;
+      };
+    };
+
+type CompoundPrizePool =
+  | null
+  | undefined
+  | {
+      cToken: string;
+    };
+
+export type PoolGraphData = {
+  underlyingCollateralSymbol: string;
+  underlyingCollateralToken: string;
+  compoundPrizePool: CompoundPrizePool;
+  id: string;
+  prizeStrategy: {
+    singleRandomWinner: PrizeStrategy;
+    multipleWinners: PrizeStrategy;
+  };
 };
 
 // export const GetExampleQuery = async (userAddress) => {

@@ -4,9 +4,11 @@ import { useInterval } from '../../utils/useInterval';
 import { Props } from './Countdown.types';
 import { CountdownContainer, CountdownDigit, CountdownText } from './styled';
 
-const Countdown: React.FC<Props> = ({ prizeGivingTimestamp }: Props) => {
-  const [countdownTimer, setCountdownTimer] = useState<number>(prizeGivingTimestamp);
+const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
+  const [countdownTimer, setCountdownTimer] = useState<number>(prizeGivingSecondsRemaining);
   const [display, setDisplay] = useState<React.ReactNode[]>([]);
+
+  const [initializedTime, _] = useState(Date.now());
 
   useInterval(() => {
     setCountdownTimer(countdownTimer - 1);
@@ -17,7 +19,7 @@ const Countdown: React.FC<Props> = ({ prizeGivingTimestamp }: Props) => {
       const content: React.ReactNode[] = [];
       const time = formatDuration(
         intervalToDuration({
-          start: new Date(0),
+          start: new Date(initializedTime),
           end: new Date(countdownTimer * 1000),
         }),
         { delimiter: ', ' },

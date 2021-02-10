@@ -2,82 +2,50 @@ import React, { useEffect, useState } from 'react';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { contractAddresses } from '@pooltogether/current-pool-data';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
-import { GetPools, GetPoolsById } from '../../ptGraphClient';
+import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
-
-const cards: PoolCardProps[] = [
-  {
-    tokenImageUrl: 'https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg',
-    tokenSymbol: 'DAI',
-    prizeValue: '4,255',
-    userBalance: '23.50',
-    countdown: {
-      days: 4,
-      hours: 3,
-      minutes: 7,
-    },
-    prizeGivingTimestamp: '1',
-  },
-  {
-    tokenImageUrl: 'https://app.pooltogether.com/_next/static/images/token-uni-451e466d1b684adf13ce4990aee5b04b.png',
-    tokenSymbol: 'UNI',
-    prizeValue: '1,052',
-    userBalance: '0.00',
-    countdown: {
-      days: 4,
-      hours: 3,
-      minutes: 7,
-    },
-    prizeGivingTimestamp: '2',
-  },
-  {
-    tokenImageUrl:
-      'https://app.pooltogether.com/_next/static/images/usdc-new-transparent-61b9e782ef440264b641b5723a503473.png',
-    tokenSymbol: 'USDC',
-    prizeValue: '1,535',
-    userBalance: '137.00',
-    countdown: {
-      days: 0,
-      hours: 10,
-      minutes: 8,
-    },
-    prizeGivingTimestamp: '3',
-  },
-];
-
+import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
+import { usePoolChainData } from '../../providers/pools-chain';
 const Pools: React.FC = () => {
   const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
+  const pools = usePoolData();
+  const controlledTokenBalances = useControlledTokenBalances();
+  const poolChainData = usePoolChainData();
   useEffect(() => {
-    console.log('This is called');
-    const pools = Object.keys(contractAddresses['1'])
-      .filter((x) => !!contractAddresses['1'][x].prizePool)
-      .map((x) => contractAddresses['1'][x].prizePool.toLowerCase());
-    (async () => {
-      const value: {
-        prizePools: [
-          {
-            underlyingCollateralSymbol: string;
-            underlyingCollateralToken: string;
-            maxTimelockDuration: string;
-          },
-        ];
-      } = await GetPoolsById(pools);
-      const p: PoolCardProps[] = value.prizePools.map((x) => ({
+    setPrizePools(
+      pools.map((x, index) => ({
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
-        userBalance: '0.0',
+        userBalance: controlledTokenBalances.length < pools.length ? '0.0' : controlledTokenBalances[index],
         prizeValue: '1000',
         countdown: {
           days: 0,
           hours: 10,
           minutes: 8,
         },
-        prizeGivingTimestamp: x.maxTimelockDuration,
-      }));
+        secondsRemaining: (x.poolGraphData.prizeStrategy.multipleWinners != null
+          ? x.poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
+          : x.poolGraphData.prizeStrategy.singleRandomWinner
+          ? x.poolGraphData.prizeStrategy.singleRandomWinner.prizePeriodEndAt
+          : Date.now()) as number,
+      })),
+    );
 
-      setPrizePools(p);
-    })();
-  }, []);
+    if (pools.length > 0) {
+      console.log(
+        pools[0].poolGraphData.prizeStrategy.multipleWinners != null
+          ? pools[0].poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
+          : pools[0].poolGraphData.prizeStrategy.singleRandomWinner
+          ? pools[0].poolGraphData.prizeStrategy.singleRandomWinner.prizePeriodEndAt
+          : Date.now(),
+      );
+    }
+
+    if (pools.length > 0) {
+      console.log('poolChainData');
+      console.log(pools[0].prizeStrategyContract);
+    }
+  }, [JSON.stringify(pools), JSON.stringify(controlledTokenBalances), JSON.stringify(poolChainData)]);
 
   return (
     <>
