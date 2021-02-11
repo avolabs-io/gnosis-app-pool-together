@@ -3,31 +3,32 @@ import { usePoolData } from '../providers/pools';
 import { useState } from 'react';
 import { useNetworkProvider } from '../providers/ethers';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { ethers } from 'ethers';
+import { BigNumber } from 'ethers';
+import { Contract, Provider } from 'ethers-multicall';
+import ERC20 from '../abis/erc20';
 
 // REFACTOR
 export const useControlledTokenBalances = () => {
   const pools = usePoolData();
-  const { sdk } = useSafeAppsSDK();
-  const [controlledTokenBalances, setControlledTokenBalances] = useState<string[]>([]);
+  const { sdk, safe } = useSafeAppsSDK();
+  const provider = useNetworkProvider();
+  const [controlledTokenBalances, setControlledTokenBalances] = useState<BigNumber[]>([]);
   useEffect(() => {
     (async () => {
-      const address = (await sdk.getSafeInfo()).safeAddress;
+      const ethCallProvider = new Provider(provider);
+      await ethCallProvider.init();
       const reqs = [];
       for (const pool of pools) {
-        reqs.push(
-          sdk.eth.call([
-            {
-              from: address,
-              to: pool.ticketContract.address,
-              data: pool.ticketContract.interface.encodeFunctionData('balanceOf', [address]),
-            },
-          ]),
-        );
+        reqs.push(new Contract(pool.ticketAddress, ERC20).balanceOf(safe.safeAddress));
       }
-      Promise.all(reqs).then((values) => {
-        setControlledTokenBalances(values.map((value) => ethers.utils.formatEther(value)));
-      });
+      let controlledTokenBalances: BigNumber[];
+      try {
+        controlledTokenBalances = await ethCallProvider.all(reqs);
+      } catch (e) {
+        console.log(e);
+        return;
+      }
+      setControlledTokenBalances(controlledTokenBalances);
     })();
   }, [pools, sdk]);
   return controlledTokenBalances;

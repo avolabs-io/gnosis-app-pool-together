@@ -24,6 +24,7 @@ type PoolData = {
   ticketContract: ethers.Contract;
   sponsorshipContract: ethers.Contract;
   poolGraphData: PoolGraphData;
+  ticketAddress: string;
 };
 
 export const PoolsProvider: React.FC = ({ children }) => {
@@ -47,7 +48,10 @@ export const PoolsProvider: React.FC = ({ children }) => {
       console.log(queryResult);
 
       const p = queryArr.map((result) => {
-        const { prizeStrategy, ticket, sponsorship } = getPrizeStrategyAndTokenContracts(result, provider);
+        const { prizeStrategy, ticket, sponsorship, ticketAddress } = getPrizeStrategyAndTokenContracts(
+          result,
+          provider,
+        );
 
         return {
           id: result.id,
@@ -60,6 +64,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
           sponsorshipContract: sponsorship,
           ticketContract: ticket,
           poolGraphData: result,
+          ticketAddress: ticketAddress,
         };
       });
 
@@ -79,6 +84,7 @@ const getPrizeStrategyAndTokenContracts = (result: PoolGraphData, provider: Safe
         provider,
       ),
       ticket: new ethers.Contract(result.prizeStrategy.multipleWinners.ticket.id, ERC20Abi, provider),
+      ticketAddress: result.prizeStrategy.multipleWinners.ticket.id,
       sponsorship: new ethers.Contract(result.prizeStrategy.multipleWinners.sponsorship.id, ERC20Abi, provider),
     };
   } else if (!!result.prizeStrategy.singleRandomWinner) {
@@ -89,6 +95,7 @@ const getPrizeStrategyAndTokenContracts = (result: PoolGraphData, provider: Safe
         provider,
       ),
       ticket: new ethers.Contract(result.prizeStrategy.singleRandomWinner.ticket.id, ERC20Abi, provider),
+      ticketAddress: result.prizeStrategy.singleRandomWinner.ticket.id,
       sponsorship: new ethers.Contract(result.prizeStrategy.singleRandomWinner.sponsorship.id, ERC20Abi, provider),
     };
   }

@@ -22,7 +22,7 @@ const Deposit: React.FC = () => {
   const [error, setError] = useState(false);
   const [buttonActive, setButtonActive] = useState(false);
 
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState('');
   const [underlyingAmount, setUnderlyingAmount] = useState(BigNumber.from('0'));
   const [tokenSymbol, setTokenSymbol] = useState('');
   const { sdk, safe } = useSafeAppsSDK();
@@ -31,65 +31,70 @@ const Deposit: React.FC = () => {
     const s = pools.map((pool, index) => ({
       id: index.toString(),
       label: pool.underlyingCollateralSymbol,
-      iconUrl:  `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(pool.underlyingCollateralToken.toString())}.png`,
-    }))
+      iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
+        pool.underlyingCollateralToken.toString(),
+      )}.png`,
+    }));
     setSelectItems(s);
+    if (pools.length > 0) onSelect(activeItemId);
   }, [pools]);
 
-  const onSelect = (id : string) => {
+  const onSelect = (id: string) => {
     setActiveItemId(id);
     const pool = pools[Number(id)];
-    setTokenSymbol(pool.underlyingCollateralSymbol)
-    pool.underlyingCollateralContract.balanceOf(safe.safeAddress).then( (value: any) => {
+    setTokenSymbol(pool.underlyingCollateralSymbol);
+    pool.underlyingCollateralContract.balanceOf(safe.safeAddress).then((value: any) => {
       console.log(value);
       setMaxBalance(BigNumber.from(value));
     });
-  }
+  };
 
   useEffect(() => {
-    if(amount == ""){
+    if (amount == '') {
       setUnderlyingAmount(BigNumber.from('0'));
-      if(buttonActive) setButtonActive(false);
-    }else{
-      let newAmount
-      try{
+      if (buttonActive) setButtonActive(false);
+    } else {
+      let newAmount;
+      try {
         newAmount = ethers.utils.parseUnits(amount, 'ether');
-      }catch{
+      } catch {
         setUnderlyingAmount(BigNumber.from('0'));
-        if(!error) setError(true);
-        if(buttonActive) setButtonActive(false);
+        if (!error) setError(true);
+        if (buttonActive) setButtonActive(false);
         return;
       }
       setUnderlyingAmount(newAmount);
-      if(error) setError(false);
-      if(!buttonActive) setButtonActive(true);
+      if (error) setError(false);
+      if (!buttonActive) setButtonActive(true);
     }
+  }, [amount]);
 
-  }, [amount])
-  
   const onClick = () => {
-    if(!buttonActive) return;
-    const { underlyingCollateralContract, contract, ticketContract }= pools[Number(activeItemId)];
-    const underlyingAmountStr = underlyingAmount.toString()
-    const params = {
-      safeTxGas: 500000,
-    };
+    if (!buttonActive) return;
+    const { underlyingCollateralContract, contract, ticketContract } = pools[Number(activeItemId)];
+    const underlyingAmountStr = underlyingAmount.toString();
     const txs = [
       {
         to: underlyingCollateralContract.address,
         value: '0',
-        data: underlyingCollateralContract.interface.encodeFunctionData('approve', [contract.address, underlyingAmountStr])
+        data: underlyingCollateralContract.interface.encodeFunctionData('approve', [
+          contract.address,
+          underlyingAmountStr,
+        ]),
       },
       {
         to: contract.address,
         value: '0',
-        data: contract.interface.encodeFunctionData('depositTo', [safe.safeAddress, underlyingAmountStr, ticketContract.address, safe.safeAddress])
-      }
+        data: contract.interface.encodeFunctionData('depositTo', [
+          safe.safeAddress,
+          underlyingAmountStr,
+          ticketContract.address,
+          safe.safeAddress,
+        ]),
+      },
     ];
-    sdk.txs.send({txs, params});
-  }
-
-
+    sdk.txs.send({ txs });
+  };
 
   return (
     <Wrapper>
@@ -113,7 +118,7 @@ const Deposit: React.FC = () => {
         id="standard-name"
         label="Amount"
         value={amount}
-        meta={error ? {error: 'Please enter a valid amount'} : {}}
+        meta={error ? { error: 'Please enter a valid amount' } : {}}
         onChange={(e) => setAmount(e.target.value)}
         endAdornment={
           <Button color="secondary" size="md" onClick={() => setAmount(ethers.utils.formatEther(maxBalance))}>
@@ -122,7 +127,9 @@ const Deposit: React.FC = () => {
         }
       />
       <RightJustified>
-        <Text size="lg">Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}</Text>
+        <Text size="lg">
+          Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}
+        </Text>
       </RightJustified>
       <Divider />
       <FormButtonWrapper>

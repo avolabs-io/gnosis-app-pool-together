@@ -11,12 +11,16 @@ const Pools: React.FC = () => {
   const pools = usePoolData();
   const controlledTokenBalances = useControlledTokenBalances();
   const poolChainData = usePoolChainData();
+
   useEffect(() => {
     setPrizePools(
       pools.map((x, index) => ({
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
-        userBalance: controlledTokenBalances.length < pools.length ? '0.0' : controlledTokenBalances[index],
+        userBalance:
+          controlledTokenBalances.length < pools.length
+            ? '0.0'
+            : ethers.utils.formatEther(controlledTokenBalances[index]),
         prizeValue: '1000',
         countdown: {
           days: 0,

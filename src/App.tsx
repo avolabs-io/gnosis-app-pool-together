@@ -22,34 +22,7 @@ const pageTabItems: TabItem[] = [
   },
 ];
 const App: React.FC = () => {
-  const { sdk, safe } = useSafeAppsSDK();
-  const [submitting, setSubmitting] = useState(false);
-
   const [selected, setSelected] = useState<string>('0');
-
-  const [activeItemId, setActiveItemId] = useState('1');
-
-  const submitTx = useCallback(async () => {
-    setSubmitting(true);
-    try {
-      const { safeTxHash } = await sdk.txs.send({
-        txs: [
-          {
-            to: safe.safeAddress,
-            value: '0',
-            data: '0x',
-          },
-        ],
-      });
-      console.log({ safeTxHash });
-      const safeTx = await sdk.txs.getBySafeTxHash(safeTxHash);
-      console.log({ safeTx });
-    } catch (e) {
-      console.error(e);
-    }
-    setSubmitting(false);
-  }, [safe, sdk]);
-
   return (
     <>
       <Tab selectedTab={selected} variant="outlined" items={pageTabItems} onChange={(x) => setSelected(x)} fullWidth />

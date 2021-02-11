@@ -11,56 +11,102 @@ import {
 import { SelectItem } from '../../types';
 import { Link } from './styled';
 
-// import { contractAddresses } from '@pooltogether/current-pool-data';
-import { ethers } from 'ethers';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { SafeAppsSdkProvider } from '@gnosis.pm/safe-apps-ethers-provider';
-import { daiAbi } from '../../abis/dai';
-import { daiPoolAbi } from '../../abis/daiPool';
-
-const withdrawSelectItems: Array<SelectItem> = [
-  {
-    id: '1',
-    label: 'DAI',
-    subLabel: '23.50 tickets',
-    iconUrl: 'https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg',
-  },
-  { id: '2', label: 'GNO', iconUrl: '' },
-  { id: '3', label: 'without icon' },
-];
-
-declare const window: any;
+import { ethers, BigNumber, constants } from 'ethers';
+import { usePoolData } from '../../providers/pools';
+import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
 
 const Withdraw: React.FC = () => {
-  const [activeItemId, setActiveItemId] = useState('1');
+  const [activeItemId, setActiveItemId] = useState('0');
+  const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
+  const [maxBalance, setMaxBalance] = useState(constants.Zero);
+
+  const [error, setError] = useState(false);
+  const [buttonActive, setButtonActive] = useState(false);
+
+  const [amount, setAmount] = useState('');
+  const [underlyingAmount, setUnderlyingAmount] = useState(constants.Zero);
+  const [tokenSymbol, setTokenSymbol] = useState('');
+  const { sdk, safe } = useSafeAppsSDK();
+  const pools = usePoolData();
+  const controlledTokenBalances = useControlledTokenBalances();
+  useEffect(() => {
+    const s = pools.map((pool, index) => ({
+      id: index.toString(),
+      label: pool.underlyingCollateralSymbol,
+      subLabel:
+        controlledTokenBalances.length < pools.length
+          ? '0.0 tickets'
+          : `${ethers.utils.formatEther(controlledTokenBalances[index])} tickets`,
+      iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
+        pool.underlyingCollateralToken.toString(),
+      )}.png`,
+    }));
+    setSelectItems(s);
+    if (pools.length > 0) onSelect(activeItemId);
+  }, [pools, controlledTokenBalances]);
 
   const [hasFairnessFee, setHasFairnessFee] = useState(false);
 
+  const onSelect = (id: string) => {
+    setActiveItemId(id);
+    const pool = pools[Number(id)];
+    setTokenSymbol(pool.underlyingCollateralSymbol);
+    console.log('SEEETITTTING SYMBOL');
+    pool.contract.timelockBalanceOf(safe.safeAddress).then((value: BigNumber) => {
+      console.log('TIMELOCKED BALANCE' + value);
+      if (value.gt(constants.Zero)) {
+        setHasFairnessFee(true);
+      }
+    });
+    if (controlledTokenBalances.length === pools.length) {
+      setMaxBalance(controlledTokenBalances[Number(id)]);
+    }
+  };
+
   useEffect(() => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    if (amount == '') {
+      setUnderlyingAmount(BigNumber.from('0'));
+      if (buttonActive) setButtonActive(false);
+    } else {
+      let newAmount;
+      try {
+        newAmount = ethers.utils.parseUnits(amount, 'ether');
+      } catch {
+        setUnderlyingAmount(BigNumber.from('0'));
+        if (!error) setError(true);
+        if (buttonActive) setButtonActive(false);
+        return;
+      }
+      setUnderlyingAmount(newAmount);
+      if (error) setError(false);
+      if (!buttonActive) setButtonActive(true);
+    }
+  }, [amount]);
 
-    const daiPoolAddress = '0x4706856FA8Bb747D50b4EF8547FE51Ab5Edc4Ac2';
-    // const daiPoolAddress = contractAddresses[CHAIN_ID].dai.prizePool; //TODO improvement add typescript declerations
-    const daiPoolContract = new ethers.Contract(daiPoolAddress, daiPoolAbi, provider);
-
-    const daiPoolWithSigner = daiPoolContract.connect(signer);
-
-    daiPoolWithSigner.liquidityCap().then((res: BigInt) => console.log(res.toString()));
-
-    // const daiAddress = '0x04bbc998daa6eb57cf5a845805312102799a1963';
-
-    // const daiContract = new ethers.Contract(daiAddress, daiAbi, provider);
-
-    // console.log(daiContract.name());
-
-    // const dai = ethers.utils.parseUnits('1.0', 18);
-
-    // const tx = daiWithSigner.transfer('0xD2532adf827b0341031CB3C96927024C23cCE9eE', dai);
-
-    // console.log(tx);
-    // console.log(provider);
-  }, []);
+  const onClick = () => {
+    if (!buttonActive) return;
+    const { contract, ticketContract } = pools[Number(activeItemId)];
+    const underlyingAmountStr = underlyingAmount.toString();
+    const txs = [
+      // {
+      //   to: ticketContract.address,
+      //   value: '0',
+      //   data: ticketContract.interface.encodeFunctionData('approve', [contract.address, underlyingAmountStr]),
+      // },
+      {
+        to: contract.address,
+        value: '0',
+        data: contract.interface.encodeFunctionData('withdrawInstantlyFrom', [
+          safe.safeAddress,
+          underlyingAmountStr,
+          ticketContract.address,
+          constants.MaxUint256,
+        ]),
+      },
+    ];
+    sdk.txs.send({ txs });
+  };
 
   return (
     <Wrapper>
@@ -73,17 +119,16 @@ const Withdraw: React.FC = () => {
       <Divider />
       <Label size="lg">Select the prize pool to withdraw from</Label>
       <Select
-        items={withdrawSelectItems}
+        items={selectItems}
         activeItemId={activeItemId}
-        onItemClick={(id) => {
-          setActiveItemId(id);
-        }}
-        fallbackImage=""
+        onItemClick={onSelect}
+        fallbackImage="https://ipfs.io/ipfs/QmZ3oug89a3BaVqdJrJEA8CKmLF4M8snuAnphR6z1yq8V8/static/media/dai.7df58851.svg"
       />
       {hasFairnessFee && (
         <RightJustified>
           <Text size="lg" color="error">
-            By withdrawing early from this pool you will be subject to a <Link href="/poolTogether">fairness</Link> fee.
+            By withdrawing early from this pool you will be subject to a{' '}
+            <Link href="https://docs.pooltogether.com/protocol/prize-pool/fairness">fairness</Link> fee.
           </Text>
         </RightJustified>
       )}
@@ -92,23 +137,24 @@ const Withdraw: React.FC = () => {
       <TextField
         id="standard-name"
         label="Amount"
-        value=""
-        onChange={() => {
-          () => console.log('i changed');
-        }}
+        value={amount}
+        meta={error ? { error: 'Please enter a valid amount' } : {}}
+        onChange={(e) => setAmount(e.target.value)}
         endAdornment={
-          <Button color="secondary" size="md">
+          <Button color="secondary" size="md" onClick={() => setAmount(ethers.utils.formatEther(maxBalance))}>
             <Heading>MAX</Heading>
           </Button>
         }
       />
       <RightJustified>
-        <Text size="lg">Maximum 23.50 DAI</Text>
+        <Text size="lg">
+          Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}
+        </Text>
       </RightJustified>
       <Divider />
       <FormButtonWrapper>
-        <Button color="secondary" size="lg" variant="contained">
-          Withdraw DAI
+        <Button color="secondary" size="lg" variant="contained" onClick={onClick}>
+          Withdraw {tokenSymbol}
         </Button>
       </FormButtonWrapper>
     </Wrapper>
