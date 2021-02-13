@@ -4,11 +4,6 @@ type PoolCardProps = {
   tokenSymbol: string;
   tokenImageUrl: string;
   userBalance: string;
-  countdown: {
-    days: number;
-    hours: number;
-    minutes: number;
-  };
   secondsRemaining: number;
 };
 

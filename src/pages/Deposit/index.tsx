@@ -52,8 +52,7 @@ const Deposit: React.FC = () => {
     setActiveItemId(id);
     const pool = pools[Number(id)];
     setTokenSymbol(pool.underlyingCollateralSymbol);
-    pool.underlyingCollateralContract.balanceOf(safe.safeAddress).then((value: any) => {
-      console.log(value);
+    pool.underlyingCollateralContract.balanceOf(safe.safeAddress).then((value: string) => {
       setMaxBalance(BigNumber.from(value));
     });
   };

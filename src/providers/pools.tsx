@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SafeAppsSdkProvider } from '@gnosis.pm/safe-apps-ethers-provider';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { useNetworkProvider } from './ethers';
 import { contractAddresses } from '@pooltogether/current-pool-data';
 import { GetPoolsById, PoolGraphData } from '../ptGraphClient';
@@ -91,7 +90,7 @@ const getPrizeStrategyAndTokenContracts = (result: PoolGraphData, provider: Safe
     return {
       prizeStrategy: new ethers.Contract(
         result.prizeStrategy.singleRandomWinner.id,
-        MultipleWinnersPrizeStrategyAbi,
+        SingleRandomWinnerPrizeStrategyAbi,
         provider,
       ),
       ticket: new ethers.Contract(result.prizeStrategy.singleRandomWinner.ticket.id, ERC20Abi, provider),

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React from 'react';
 import { Tab } from '@gnosis.pm/safe-react-components';
 import { useNavigation } from './providers/navigation';
 import { Pools, Deposit, Withdraw } from './pages';

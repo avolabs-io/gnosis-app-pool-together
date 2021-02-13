@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { contractAddresses } from '@pooltogether/current-pool-data';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
 import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
