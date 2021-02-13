@@ -13,9 +13,18 @@ import { usePoolData } from '../../providers/pools';
 import { ethers, BigNumber } from 'ethers';
 
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { useNavigation } from '../../providers/navigation';
 
 const Deposit: React.FC = () => {
-  const [activeItemId, setActiveItemId] = useState('0');
+  const { navigation, setNavigation } = useNavigation();
+  const { selectedPool, selectedPage } = navigation;
+  const [activeItemId, setActiveItemId] = useState(selectedPool);
+  if (selectedPool != '0') {
+    setNavigation({
+      selectedPage,
+      selectedPool: '0',
+    });
+  }
   const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
   const [maxBalance, setMaxBalance] = useState(BigNumber.from('0'));
 

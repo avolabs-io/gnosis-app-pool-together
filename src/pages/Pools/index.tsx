@@ -15,6 +15,7 @@ const Pools: React.FC = () => {
   useEffect(() => {
     setPrizePools(
       pools.map((x, index) => ({
+        poolIndex: index.toString(),
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
         userBalance:

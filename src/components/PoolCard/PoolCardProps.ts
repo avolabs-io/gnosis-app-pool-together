@@ -1,4 +1,5 @@
 type PoolCardProps = {
+  poolIndex: string;
   prizeValue: string;
   tokenSymbol: string;
   tokenImageUrl: string;

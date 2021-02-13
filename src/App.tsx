@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { Tab } from '@gnosis.pm/safe-react-components';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
+import { useNavigation } from './providers/navigation';
 import { Pools, Deposit, Withdraw } from './pages';
 import { TabItem } from './types';
 
@@ -22,13 +22,27 @@ const pageTabItems: TabItem[] = [
   },
 ];
 const App: React.FC = () => {
-  const [selected, setSelected] = useState<string>('0');
+  const { navigation, setNavigation } = useNavigation();
+
+  const { selectedPage, selectedPool } = navigation;
+  const setSelectedPage = (page: string) => {
+    setNavigation({
+      selectedPool: selectedPool,
+      selectedPage: page,
+    });
+  };
   return (
     <>
-      <Tab selectedTab={selected} variant="outlined" items={pageTabItems} onChange={(x) => setSelected(x)} fullWidth />
-      {selected === '0' && <Pools />}
-      {selected === '1' && <Deposit />}
-      {selected === '2' && <Withdraw />}
+      <Tab
+        selectedTab={selectedPage}
+        variant="outlined"
+        items={pageTabItems}
+        onChange={(x) => setSelectedPage(x)}
+        fullWidth
+      />
+      {selectedPage === '0' && <Pools />}
+      {selectedPage === '1' && <Deposit />}
+      {selectedPage === '2' && <Withdraw />}
     </>
   );
 };
