@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
 import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
-import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
+import { useTicketBalances } from '../../providers/tickets';
 import { usePoolChainData } from '../../providers/pools-chain';
+import { useDidMount } from '../../hooks/useDidMount';
 const Pools: React.FC = () => {
   const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
   const pools = usePoolData();
-  const controlledTokenBalances = useControlledTokenBalances();
+  const { ticketBalances, refreshTicketBalances } = useTicketBalances();
   const poolChainData = usePoolChainData();
+  useDidMount(() => refreshTicketBalances());
 
   useEffect(() => {
     setPrizePools(
@@ -16,10 +18,7 @@ const Pools: React.FC = () => {
         poolIndex: index.toString(),
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
-        userBalance:
-          controlledTokenBalances.length < pools.length
-            ? '0.0'
-            : ethers.utils.formatEther(controlledTokenBalances[index]),
+        userBalance: ticketBalances.length < pools.length ? '0.0' : ethers.utils.formatEther(ticketBalances[index]),
         prizeValue: '1000',
         countdown: {
           days: 0,
@@ -48,7 +47,7 @@ const Pools: React.FC = () => {
       console.log('poolChainData');
       console.log(pools[0].prizeStrategyContract);
     }
-  }, [JSON.stringify(pools), JSON.stringify(controlledTokenBalances), JSON.stringify(poolChainData)]);
+  }, [JSON.stringify(pools), JSON.stringify(ticketBalances), JSON.stringify(poolChainData)]);
 
   return (
     <>

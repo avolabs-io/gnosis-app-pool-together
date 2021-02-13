@@ -2,8 +2,7 @@ import fetch from 'cross-fetch';
 
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-import { POOLS_QUERY, POOLS_BY_ID } from './queries';
-
+import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES } from './queries';
 export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
@@ -49,6 +48,31 @@ export const GetPoolsById = async (ids: string[]) => {
     console.log(error);
     return { error: true, message: error };
   }
+};
+
+export const GetUserAccountBalances = async (id: string) => {
+  try {
+    const { data } = await ptClient.query({
+      query: USERS_TOKEN_BALANCES,
+      variables: {
+        account: id,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('error');
+    console.log(error);
+    return { error: true, message: error };
+  }
+};
+
+export type UserAccount = {
+  controlledTokenBalances: {
+    controlledToken: {
+      id: string;
+    };
+    balance: string;
+  }[];
 };
 
 type PrizeStrategy =

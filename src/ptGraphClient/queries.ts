@@ -13,6 +13,19 @@ export const POOLS_QUERY = gql`
     }
   }
 `;
+
+export const USERS_TOKEN_BALANCES = gql`
+  query GetTokenBalances($account: String!) {
+    accounts(where: { id: $account }) {
+      controlledTokenBalances {
+        controlledToken {
+          id
+        }
+        balance
+      }
+    }
+  }
+`;
 export const POOLS_BY_ID = gql`
   query GetPoolsById($poolAddresses: [String!]!) {
     prizePools(where: { id_in: $poolAddresses }) {

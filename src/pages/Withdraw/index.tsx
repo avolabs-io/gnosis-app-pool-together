@@ -14,8 +14,9 @@ import { Link } from './styled';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { ethers, BigNumber, constants } from 'ethers';
 import { usePoolData } from '../../providers/pools';
-import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
-
+import { useTicketBalances } from '../../providers/tickets';
+import { useDidMount } from '../../hooks/useDidMount';
+// eslint-disable-next-line no-var
 const Withdraw: React.FC = () => {
   const [activeItemId, setActiveItemId] = useState('0');
   const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
@@ -29,22 +30,24 @@ const Withdraw: React.FC = () => {
   const [tokenSymbol, setTokenSymbol] = useState('');
   const { sdk, safe } = useSafeAppsSDK();
   const pools = usePoolData();
-  const controlledTokenBalances = useControlledTokenBalances();
+  const { ticketBalances, refreshTicketBalances } = useTicketBalances();
+
+  useDidMount(() => refreshTicketBalances());
   useEffect(() => {
     const s = pools.map((pool, index) => ({
       id: index.toString(),
       label: pool.underlyingCollateralSymbol,
       subLabel:
-        controlledTokenBalances.length < pools.length
+        ticketBalances.length < pools.length
           ? '0.0 tickets'
-          : `${ethers.utils.formatEther(controlledTokenBalances[index])} tickets`,
+          : `${ethers.utils.formatEther(ticketBalances[index])} tickets`,
       iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
         pool.underlyingCollateralToken.toString(),
       )}.png`,
     }));
     setSelectItems(s);
     if (pools.length > 0) onSelect(activeItemId);
-  }, [pools, controlledTokenBalances]);
+  }, [pools, JSON.stringify(ticketBalances)]);
 
   const [hasFairnessFee, setHasFairnessFee] = useState(false);
 
@@ -52,15 +55,13 @@ const Withdraw: React.FC = () => {
     setActiveItemId(id);
     const pool = pools[Number(id)];
     setTokenSymbol(pool.underlyingCollateralSymbol);
-    console.log('SEEETITTTING SYMBOL');
     pool.contract.timelockBalanceOf(safe.safeAddress).then((value: BigNumber) => {
-      console.log('TIMELOCKED BALANCE' + value);
       if (value.gt(constants.Zero)) {
         setHasFairnessFee(true);
       }
     });
-    if (controlledTokenBalances.length === pools.length) {
-      setMaxBalance(controlledTokenBalances[Number(id)]);
+    if (ticketBalances.length === pools.length) {
+      setMaxBalance(ticketBalances[Number(id)]);
     }
   };
 

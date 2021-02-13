@@ -7,6 +7,7 @@ import SafeProvider from '@gnosis.pm/safe-apps-react-sdk';
 import { EthersProvider } from './providers/ethers';
 import { PoolsProvider } from './providers/pools';
 import { NavigationProvider } from './providers/navigation';
+import { TicketsProvider } from './providers/tickets';
 
 import GlobalStyle from './GlobalStyle';
 import App from './App';
@@ -26,9 +27,11 @@ ReactDOM.render(
       >
         <EthersProvider>
           <PoolsProvider>
-            <NavigationProvider>
-              <App />
-            </NavigationProvider>
+            <TicketsProvider>
+              <NavigationProvider>
+                <App />
+              </NavigationProvider>
+            </TicketsProvider>
           </PoolsProvider>
         </EthersProvider>
       </SafeProvider>
