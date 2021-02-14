@@ -18,6 +18,7 @@ type PoolData = {
   underlyingCollateralDecimals: string;
   ticketDecimals: string;
   sponsorshipDecimals: string;
+  prizePoolType: string;
   id: string;
   contract: ethers.Contract;
   underlyingCollateralContract: ethers.Contract;
@@ -61,6 +62,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
 
         return {
           id: result.id,
+          prizePoolType: result.prizePoolType,
           underlyingCollateralSymbol: result.underlyingCollateralSymbol,
           underlyingCollateralToken: result.underlyingCollateralToken,
           underlyingCollateralDecimals: result.underlyingCollateralDecimals,

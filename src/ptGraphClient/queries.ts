@@ -33,6 +33,7 @@ export const POOLS_BY_ID = gql`
       underlyingCollateralSymbol
       underlyingCollateralToken
       underlyingCollateralDecimals
+      prizePoolType
       compoundPrizePool {
         cToken
       }

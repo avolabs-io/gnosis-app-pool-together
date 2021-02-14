@@ -104,6 +104,7 @@ export type PoolGraphData = {
   underlyingCollateralSymbol: string;
   underlyingCollateralToken: string;
   compoundPrizePool: CompoundPrizePool;
+  prizePoolType: string;
   underlyingCollateralDecimals: string;
   id: string;
   prizeStrategy: {

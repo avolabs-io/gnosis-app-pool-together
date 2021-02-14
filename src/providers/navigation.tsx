@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext } from 'react';
 
 type Navigation = {
-  selectedPool: string;
+  initiallySelectedPool: string;
   selectedPage: string;
 };
 
@@ -12,7 +12,7 @@ type NavigationContextType = {
 
 const NavigationContext = createContext<NavigationContextType>({
   navigation: {
-    selectedPool: '0',
+    initiallySelectedPool: '0',
     selectedPage: '0',
   },
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -21,7 +21,7 @@ const NavigationContext = createContext<NavigationContextType>({
 
 export const NavigationProvider: React.FC = ({ children }) => {
   const [navigation, setNavigation] = useState<Navigation>({
-    selectedPool: '0',
+    initiallySelectedPool: '0',
     selectedPage: '0',
   });
   return (

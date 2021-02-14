@@ -24,10 +24,10 @@ const pageTabItems: TabItem[] = [
 const App: React.FC = () => {
   const { navigation, setNavigation } = useNavigation();
 
-  const { selectedPage, selectedPool } = navigation;
+  const { selectedPage, initiallySelectedPool } = navigation;
   const setSelectedPage = (page: string) => {
     setNavigation({
-      selectedPool: selectedPool,
+      initiallySelectedPool,
       selectedPage: page,
     });
   };

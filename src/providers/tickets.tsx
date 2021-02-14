@@ -31,7 +31,7 @@ export const TicketsProvider: React.FC = ({ children }) => {
     const userAccount: UserAccount = r.accounts[0];
     const tokenBalances = userAccount.controlledTokenBalances;
 
-    if (!tokenBalances || tokenBalances.length == 0) return;
+    if (!tokenBalances) return;
     for (const pool of pools) {
       const t = tokenBalances.find((x) => x.controlledToken.id == pool.ticketAddress.toLowerCase());
       if (t) {

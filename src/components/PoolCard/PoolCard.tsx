@@ -67,7 +67,7 @@ const PoolCard: React.FC<PoolCardProps> = ({
             size="lg"
             color="primary"
             variant="contained"
-            onClick={() => setNavigation({ selectedPage: '1', selectedPool: poolIndex })}
+            onClick={() => setNavigation({ selectedPage: '1', initiallySelectedPool: poolIndex })}
           >
             Deposit {tokenSymbol}
           </Button>

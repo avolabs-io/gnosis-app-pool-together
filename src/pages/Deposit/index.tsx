@@ -17,12 +17,12 @@ import { useNavigation } from '../../providers/navigation';
 
 const Deposit: React.FC = () => {
   const { navigation, setNavigation } = useNavigation();
-  const { selectedPool, selectedPage } = navigation;
-  const [activeItemId, setActiveItemId] = useState(selectedPool);
-  if (selectedPool != '0') {
+  const { initiallySelectedPool, selectedPage } = navigation;
+  const [activeItemId, setActiveItemId] = useState(initiallySelectedPool);
+  if (initiallySelectedPool != '0') {
     setNavigation({
       selectedPage,
-      selectedPool: '0',
+      initiallySelectedPool: '0',
     });
   }
   const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
@@ -41,6 +41,7 @@ const Deposit: React.FC = () => {
     const s = pools.map((pool, index) => ({
       id: index.toString(),
       label: pool.underlyingCollateralSymbol,
+      subLabel: pool.prizePoolType ? `${pool.prizePoolType} Prize Pool` : undefined,
       iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
         pool.underlyingCollateralToken.toString(),
       )}.png`,
