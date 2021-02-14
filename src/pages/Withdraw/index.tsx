@@ -52,17 +52,30 @@ const Withdraw: React.FC = () => {
   const [hasFairnessFee, setHasFairnessFee] = useState(false);
 
   const onSelect = (id: string) => {
+    const index = Number(id);
     setActiveItemId(id);
-    const pool = pools[Number(id)];
+    const pool = pools[index];
     setTokenSymbol(pool.underlyingCollateralSymbol);
-    pool.contract.timelockBalanceOf(safe.safeAddress).then((value: BigNumber) => {
-      if (value.gt(constants.Zero)) {
-        setHasFairnessFee(true);
-      }
-    });
-    if (ticketBalances.length === pools.length) {
-      setMaxBalance(ticketBalances[Number(id)]);
-    }
+    if (ticketBalances.length !== pools.length) return;
+    const { contract, ticketAddress } = pool;
+    sdk.eth
+      .call([
+        {
+          to: contract.address,
+          data: contract.interface.encodeFunctionData('calculateTimelockDuration', [
+            safe.safeAddress,
+            ticketAddress,
+            ticketBalances[index],
+          ]),
+        },
+      ])
+      .then((x) => {
+        if (contract.interface.decodeFunctionResult('calculateTimelockDuration', x).durationSeconds.gt(0)) {
+          setHasFairnessFee(true);
+        }
+      })
+      .catch((x) => console.log(x));
+    setMaxBalance(ticketBalances[index]);
   };
 
   useEffect(() => {
@@ -128,7 +141,7 @@ const Withdraw: React.FC = () => {
       {hasFairnessFee && (
         <RightJustified>
           <Text size="lg" color="error">
-            By withdrawing early from this pool you will be subject to a{' '}
+            By withdrawing from this pool you may be subject to a{' '}
             <Link href="https://docs.pooltogether.com/protocol/prize-pool/fairness">fairness</Link> fee.
           </Text>
         </RightJustified>
