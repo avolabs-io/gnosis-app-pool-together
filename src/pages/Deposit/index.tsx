@@ -10,7 +10,7 @@ import {
 } from '../../components/GeneralStyled';
 import { SelectItem } from '../../types';
 import { usePoolData } from '../../providers/pools';
-import { ethers, BigNumber } from 'ethers';
+import { ethers, BigNumber, constants } from 'ethers';
 
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { useNavigation } from '../../providers/navigation';
@@ -26,13 +26,14 @@ const Deposit: React.FC = () => {
     });
   }
   const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
-  const [maxBalance, setMaxBalance] = useState(BigNumber.from('0'));
+  const [maxBalance, setMaxBalance] = useState(constants.Zero);
+  const [decimals, setDecimals] = useState('18');
 
   const [error, setError] = useState(false);
   const [buttonActive, setButtonActive] = useState(false);
 
   const [amount, setAmount] = useState('');
-  const [underlyingAmount, setUnderlyingAmount] = useState(BigNumber.from('0'));
+  const [underlyingAmount, setUnderlyingAmount] = useState(constants.Zero);
   const [tokenSymbol, setTokenSymbol] = useState('');
   const { sdk, safe } = useSafeAppsSDK();
   const pools = usePoolData();
@@ -52,6 +53,7 @@ const Deposit: React.FC = () => {
     setActiveItemId(id);
     const pool = pools[Number(id)];
     setTokenSymbol(pool.underlyingCollateralSymbol);
+    setDecimals(pool.underlyingCollateralDecimals || '18');
     pool.underlyingCollateralContract.balanceOf(safe.safeAddress).then((value: string) => {
       setMaxBalance(BigNumber.from(value));
     });
@@ -59,14 +61,14 @@ const Deposit: React.FC = () => {
 
   useEffect(() => {
     if (amount == '') {
-      setUnderlyingAmount(BigNumber.from('0'));
+      setUnderlyingAmount(constants.Zero);
       if (buttonActive) setButtonActive(false);
     } else {
       let newAmount;
       try {
-        newAmount = ethers.utils.parseUnits(amount, 'ether');
+        newAmount = ethers.utils.parseUnits(amount, decimals);
       } catch {
-        setUnderlyingAmount(BigNumber.from('0'));
+        setUnderlyingAmount(constants.Zero);
         if (!error) setError(true);
         if (buttonActive) setButtonActive(false);
         return;
@@ -101,8 +103,10 @@ const Deposit: React.FC = () => {
         ]),
       },
     ];
-    sdk.txs.send({ txs });
+    sdk.txs.send({ txs }).catch((e) => console.log(e));
   };
+
+  const formattedMaxBalance = ethers.utils.formatUnits(maxBalance, decimals);
 
   return (
     <Wrapper>
@@ -129,14 +133,14 @@ const Deposit: React.FC = () => {
         meta={error ? { error: 'Please enter a valid amount' } : {}}
         onChange={(e) => setAmount(e.target.value)}
         endAdornment={
-          <Button color="secondary" size="md" onClick={() => setAmount(ethers.utils.formatEther(maxBalance))}>
+          <Button color="secondary" size="md" onClick={() => setAmount(formattedMaxBalance)}>
             <Heading>MAX</Heading>
           </Button>
         }
       />
       <RightJustified>
         <Text size="lg">
-          Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}
+          Maximum {formattedMaxBalance} {tokenSymbol}
         </Text>
       </RightJustified>
       <Divider />

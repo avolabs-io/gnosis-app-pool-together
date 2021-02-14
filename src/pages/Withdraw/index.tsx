@@ -12,10 +12,10 @@ import { SelectItem } from '../../types';
 import { Link } from './styled';
 
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { ethers, BigNumber, constants } from 'ethers';
+import { ethers, constants } from 'ethers';
 import { usePoolData } from '../../providers/pools';
 import { useTicketBalances } from '../../providers/tickets';
-import { useDidMount } from '../../hooks/useDidMount';
+import { useDidMount } from '../../utils/useDidMount';
 // eslint-disable-next-line no-var
 const Withdraw: React.FC = () => {
   const [activeItemId, setActiveItemId] = useState('0');
@@ -24,6 +24,8 @@ const Withdraw: React.FC = () => {
 
   const [error, setError] = useState(false);
   const [buttonActive, setButtonActive] = useState(false);
+
+  const [decimals, setDecimals] = useState('18');
 
   const [amount, setAmount] = useState('');
   const [underlyingAmount, setUnderlyingAmount] = useState(constants.Zero);
@@ -40,7 +42,7 @@ const Withdraw: React.FC = () => {
       subLabel:
         ticketBalances.length < pools.length
           ? '0.0 tickets'
-          : `${ethers.utils.formatEther(ticketBalances[index])} tickets`,
+          : `${ethers.utils.formatUnits(ticketBalances[index], pool.ticketDecimals || '18')} tickets`,
       iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
         pool.underlyingCollateralToken.toString(),
       )}.png`,
@@ -57,7 +59,7 @@ const Withdraw: React.FC = () => {
     const pool = pools[index];
     setTokenSymbol(pool.underlyingCollateralSymbol);
     if (ticketBalances.length !== pools.length) return;
-    const { contract, ticketAddress } = pool;
+    const { contract, ticketAddress, ticketDecimals } = pool;
     sdk.eth
       .call([
         {
@@ -75,19 +77,20 @@ const Withdraw: React.FC = () => {
         }
       })
       .catch((x) => console.log(x));
+    setDecimals(ticketDecimals || '18');
     setMaxBalance(ticketBalances[index]);
   };
 
   useEffect(() => {
     if (amount == '') {
-      setUnderlyingAmount(BigNumber.from('0'));
+      setUnderlyingAmount(constants.Zero);
       if (buttonActive) setButtonActive(false);
     } else {
       let newAmount;
       try {
-        newAmount = ethers.utils.parseUnits(amount, 'ether');
+        newAmount = ethers.utils.parseUnits(amount, decimals);
       } catch {
-        setUnderlyingAmount(BigNumber.from('0'));
+        setUnderlyingAmount(constants.Zero);
         if (!error) setError(true);
         if (buttonActive) setButtonActive(false);
         return;
@@ -119,8 +122,10 @@ const Withdraw: React.FC = () => {
         ]),
       },
     ];
-    sdk.txs.send({ txs });
+    sdk.txs.send({ txs }).catch((e) => console.log(e));
   };
+
+  const formattedMaxBalance = ethers.utils.formatUnits(maxBalance, decimals);
 
   return (
     <Wrapper>
@@ -155,14 +160,14 @@ const Withdraw: React.FC = () => {
         meta={error ? { error: 'Please enter a valid amount' } : {}}
         onChange={(e) => setAmount(e.target.value)}
         endAdornment={
-          <Button color="secondary" size="md" onClick={() => setAmount(ethers.utils.formatEther(maxBalance))}>
+          <Button color="secondary" size="md" onClick={() => setAmount(formattedMaxBalance)}>
             <Heading>MAX</Heading>
           </Button>
         }
       />
       <RightJustified>
         <Text size="lg">
-          Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}
+          Maximum {formattedMaxBalance} {tokenSymbol}
         </Text>
       </RightJustified>
       <Divider />

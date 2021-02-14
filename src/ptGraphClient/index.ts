@@ -84,10 +84,12 @@ type PrizeStrategy =
       ticket: {
         id: string;
         totalSupply: string;
+        decimals: string;
       };
       sponsorship: {
         id: string;
         totalSupply: string;
+        decimals: string;
       };
     };
 
@@ -102,6 +104,7 @@ export type PoolGraphData = {
   underlyingCollateralSymbol: string;
   underlyingCollateralToken: string;
   compoundPrizePool: CompoundPrizePool;
+  underlyingCollateralDecimals: string;
   id: string;
   prizeStrategy: {
     singleRandomWinner: PrizeStrategy;

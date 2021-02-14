@@ -32,6 +32,7 @@ export const POOLS_BY_ID = gql`
       id
       underlyingCollateralSymbol
       underlyingCollateralToken
+      underlyingCollateralDecimals
       compoundPrizePool {
         cToken
       }
@@ -54,10 +55,12 @@ export const POOLS_BY_ID = gql`
           sponsorship {
             id
             totalSupply
+            decimals
           }
           ticket {
             id
             totalSupply
+            decimals
           }
         }
       }

@@ -4,7 +4,7 @@ import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
 import { useTicketBalances } from '../../providers/tickets';
 import { usePoolChainData } from '../../providers/pools-chain';
-import { useDidMount } from '../../hooks/useDidMount';
+import { useDidMount } from '../../utils/useDidMount';
 const Pools: React.FC = () => {
   const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
   const pools = usePoolData();
@@ -18,13 +18,11 @@ const Pools: React.FC = () => {
         poolIndex: index.toString(),
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
-        userBalance: ticketBalances.length < pools.length ? '0.0' : ethers.utils.formatEther(ticketBalances[index]),
+        userBalance:
+          ticketBalances.length < pools.length
+            ? '0.0'
+            : ethers.utils.formatUnits(ticketBalances[index], x.ticketDecimals || '18'),
         prizeValue: '1000',
-        countdown: {
-          days: 0,
-          hours: 10,
-          minutes: 8,
-        },
         secondsRemaining: (x.poolGraphData.prizeStrategy.multipleWinners != null
           ? x.poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
           : x.poolGraphData.prizeStrategy.singleRandomWinner
