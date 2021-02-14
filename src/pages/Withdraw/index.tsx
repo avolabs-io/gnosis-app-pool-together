@@ -12,10 +12,11 @@ import { SelectItem } from '../../types';
 import { Link } from './styled';
 
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { ethers, BigNumber, constants } from 'ethers';
+import { ethers, constants } from 'ethers';
 import { usePoolData } from '../../providers/pools';
-import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
-
+import { useTicketBalances } from '../../providers/tickets';
+import { useDidMount } from '../../utils/useDidMount';
+// eslint-disable-next-line no-var
 const Withdraw: React.FC = () => {
   const [activeItemId, setActiveItemId] = useState('0');
   const [selectItems, setSelectItems] = useState<SelectItem[]>([]);
@@ -24,56 +25,72 @@ const Withdraw: React.FC = () => {
   const [error, setError] = useState(false);
   const [buttonActive, setButtonActive] = useState(false);
 
+  const [decimals, setDecimals] = useState('18');
+
   const [amount, setAmount] = useState('');
   const [underlyingAmount, setUnderlyingAmount] = useState(constants.Zero);
   const [tokenSymbol, setTokenSymbol] = useState('');
   const { sdk, safe } = useSafeAppsSDK();
   const pools = usePoolData();
-  const controlledTokenBalances = useControlledTokenBalances();
+  const { ticketBalances, refreshTicketBalances } = useTicketBalances();
+
+  useDidMount(() => refreshTicketBalances());
   useEffect(() => {
     const s = pools.map((pool, index) => ({
       id: index.toString(),
       label: pool.underlyingCollateralSymbol,
       subLabel:
-        controlledTokenBalances.length < pools.length
+        ticketBalances.length < pools.length
           ? '0.0 tickets'
-          : `${ethers.utils.formatEther(controlledTokenBalances[index])} tickets`,
+          : `${ethers.utils.formatUnits(ticketBalances[index], pool.ticketDecimals || '18')} tickets`,
       iconUrl: `https://gnosis-safe-token-logos.s3.amazonaws.com/${ethers.utils.getAddress(
         pool.underlyingCollateralToken.toString(),
       )}.png`,
     }));
     setSelectItems(s);
     if (pools.length > 0) onSelect(activeItemId);
-  }, [pools, controlledTokenBalances]);
+  }, [pools, JSON.stringify(ticketBalances)]);
 
   const [hasFairnessFee, setHasFairnessFee] = useState(false);
 
   const onSelect = (id: string) => {
+    const index = Number(id);
     setActiveItemId(id);
-    const pool = pools[Number(id)];
+    const pool = pools[index];
     setTokenSymbol(pool.underlyingCollateralSymbol);
-    console.log('SEEETITTTING SYMBOL');
-    pool.contract.timelockBalanceOf(safe.safeAddress).then((value: BigNumber) => {
-      console.log('TIMELOCKED BALANCE' + value);
-      if (value.gt(constants.Zero)) {
-        setHasFairnessFee(true);
-      }
-    });
-    if (controlledTokenBalances.length === pools.length) {
-      setMaxBalance(controlledTokenBalances[Number(id)]);
-    }
+    if (ticketBalances.length !== pools.length) return;
+    const { contract, ticketAddress, ticketDecimals } = pool;
+    sdk.eth
+      .call([
+        {
+          to: contract.address,
+          data: contract.interface.encodeFunctionData('calculateTimelockDuration', [
+            safe.safeAddress,
+            ticketAddress,
+            ticketBalances[index],
+          ]),
+        },
+      ])
+      .then((x) => {
+        if (contract.interface.decodeFunctionResult('calculateTimelockDuration', x).durationSeconds.gt(0)) {
+          setHasFairnessFee(true);
+        }
+      })
+      .catch((x) => console.log(x));
+    setDecimals(ticketDecimals || '18');
+    setMaxBalance(ticketBalances[index]);
   };
 
   useEffect(() => {
     if (amount == '') {
-      setUnderlyingAmount(BigNumber.from('0'));
+      setUnderlyingAmount(constants.Zero);
       if (buttonActive) setButtonActive(false);
     } else {
       let newAmount;
       try {
-        newAmount = ethers.utils.parseUnits(amount, 'ether');
+        newAmount = ethers.utils.parseUnits(amount, decimals);
       } catch {
-        setUnderlyingAmount(BigNumber.from('0'));
+        setUnderlyingAmount(constants.Zero);
         if (!error) setError(true);
         if (buttonActive) setButtonActive(false);
         return;
@@ -105,8 +122,10 @@ const Withdraw: React.FC = () => {
         ]),
       },
     ];
-    sdk.txs.send({ txs });
+    sdk.txs.send({ txs }).catch((e) => console.log(e));
   };
+
+  const formattedMaxBalance = ethers.utils.formatUnits(maxBalance, decimals);
 
   return (
     <Wrapper>
@@ -127,7 +146,7 @@ const Withdraw: React.FC = () => {
       {hasFairnessFee && (
         <RightJustified>
           <Text size="lg" color="error">
-            By withdrawing early from this pool you will be subject to a{' '}
+            By withdrawing from this pool you may be subject to a{' '}
             <Link href="https://docs.pooltogether.com/protocol/prize-pool/fairness">fairness</Link> fee.
           </Text>
         </RightJustified>
@@ -141,14 +160,14 @@ const Withdraw: React.FC = () => {
         meta={error ? { error: 'Please enter a valid amount' } : {}}
         onChange={(e) => setAmount(e.target.value)}
         endAdornment={
-          <Button color="secondary" size="md" onClick={() => setAmount(ethers.utils.formatEther(maxBalance))}>
+          <Button color="secondary" size="md" onClick={() => setAmount(formattedMaxBalance)}>
             <Heading>MAX</Heading>
           </Button>
         }
       />
       <RightJustified>
         <Text size="lg">
-          Maximum {ethers.utils.formatEther(maxBalance)} {tokenSymbol}
+          Maximum {formattedMaxBalance} {tokenSymbol}
         </Text>
       </RightJustified>
       <Divider />

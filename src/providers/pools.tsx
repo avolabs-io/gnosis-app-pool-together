@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { SafeAppsSdkProvider } from '@gnosis.pm/safe-apps-ethers-provider';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
 import { useNetworkProvider } from './ethers';
 import { contractAddresses } from '@pooltogether/current-pool-data';
 import { GetPoolsById, PoolGraphData } from '../ptGraphClient';
@@ -16,6 +15,10 @@ const PoolsContext = createContext<PoolData[]>([]);
 type PoolData = {
   underlyingCollateralSymbol: string;
   underlyingCollateralToken: string;
+  underlyingCollateralDecimals: string;
+  ticketDecimals: string;
+  sponsorshipDecimals: string;
+  prizePoolType: string;
   id: string;
   contract: ethers.Contract;
   underlyingCollateralContract: ethers.Contract;
@@ -48,15 +51,21 @@ export const PoolsProvider: React.FC = ({ children }) => {
       console.log(queryResult);
 
       const p = queryArr.map((result) => {
-        const { prizeStrategy, ticket, sponsorship, ticketAddress } = getPrizeStrategyAndTokenContracts(
-          result,
-          provider,
-        );
+        const {
+          prizeStrategy,
+          ticket,
+          sponsorship,
+          ticketAddress,
+          ticketDecimals,
+          sponsorshipDecimals,
+        } = getPrizeStrategyAndTokenContracts(result, provider);
 
         return {
           id: result.id,
+          prizePoolType: result.prizePoolType,
           underlyingCollateralSymbol: result.underlyingCollateralSymbol,
           underlyingCollateralToken: result.underlyingCollateralToken,
+          underlyingCollateralDecimals: result.underlyingCollateralDecimals,
           contract: new ethers.Contract(result.id, PrizePoolAbi, provider),
           underlyingCollateralContract: new ethers.Contract(result.underlyingCollateralToken, ERC20Abi, provider),
           prizeStrategyContract: prizeStrategy,
@@ -65,6 +74,8 @@ export const PoolsProvider: React.FC = ({ children }) => {
           ticketContract: ticket,
           poolGraphData: result,
           ticketAddress: ticketAddress,
+          ticketDecimals,
+          sponsorshipDecimals,
         };
       });
 
@@ -85,17 +96,21 @@ const getPrizeStrategyAndTokenContracts = (result: PoolGraphData, provider: Safe
       ),
       ticket: new ethers.Contract(result.prizeStrategy.multipleWinners.ticket.id, ERC20Abi, provider),
       ticketAddress: result.prizeStrategy.multipleWinners.ticket.id,
+      ticketDecimals: result.prizeStrategy.multipleWinners.ticket.decimals,
+      sponsorshipDecimals: result.prizeStrategy.multipleWinners.sponsorship.decimals,
       sponsorship: new ethers.Contract(result.prizeStrategy.multipleWinners.sponsorship.id, ERC20Abi, provider),
     };
   } else if (!!result.prizeStrategy.singleRandomWinner) {
     return {
       prizeStrategy: new ethers.Contract(
         result.prizeStrategy.singleRandomWinner.id,
-        MultipleWinnersPrizeStrategyAbi,
+        SingleRandomWinnerPrizeStrategyAbi,
         provider,
       ),
       ticket: new ethers.Contract(result.prizeStrategy.singleRandomWinner.ticket.id, ERC20Abi, provider),
       ticketAddress: result.prizeStrategy.singleRandomWinner.ticket.id,
+      ticketDecimals: result.prizeStrategy.singleRandomWinner.ticket.decimals,
+      sponsorshipDecimals: result.prizeStrategy.singleRandomWinner.sponsorship.decimals,
       sponsorship: new ethers.Contract(result.prizeStrategy.singleRandomWinner.sponsorship.id, ERC20Abi, provider),
     };
   }

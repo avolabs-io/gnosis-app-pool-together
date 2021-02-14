@@ -1,32 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { contractAddresses } from '@pooltogether/current-pool-data';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
 import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
-import { useControlledTokenBalances } from '../../hooks/useControlledTokenBalances';
+import { useTicketBalances } from '../../providers/tickets';
 import { usePoolChainData } from '../../providers/pools-chain';
+import { useDidMount } from '../../utils/useDidMount';
 const Pools: React.FC = () => {
   const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
   const pools = usePoolData();
-  const controlledTokenBalances = useControlledTokenBalances();
+  const { ticketBalances, refreshTicketBalances } = useTicketBalances();
   const poolChainData = usePoolChainData();
+  useDidMount(() => refreshTicketBalances());
 
   useEffect(() => {
     setPrizePools(
       pools.map((x, index) => ({
+        poolIndex: index.toString(),
         tokenImageUrl: ethers.utils.getAddress(x.underlyingCollateralToken.toString()),
         tokenSymbol: x.underlyingCollateralSymbol.toString(),
         userBalance:
-          controlledTokenBalances.length < pools.length
+          ticketBalances.length < pools.length
             ? '0.0'
-            : ethers.utils.formatEther(controlledTokenBalances[index]),
+            : ethers.utils.formatUnits(ticketBalances[index], x.ticketDecimals || '18'),
         prizeValue: '1000',
-        countdown: {
-          days: 0,
-          hours: 10,
-          minutes: 8,
-        },
         secondsRemaining: (x.poolGraphData.prizeStrategy.multipleWinners != null
           ? x.poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
           : x.poolGraphData.prizeStrategy.singleRandomWinner
@@ -49,7 +45,7 @@ const Pools: React.FC = () => {
       console.log('poolChainData');
       console.log(pools[0].prizeStrategyContract);
     }
-  }, [JSON.stringify(pools), JSON.stringify(controlledTokenBalances), JSON.stringify(poolChainData)]);
+  }, [JSON.stringify(pools), JSON.stringify(ticketBalances), JSON.stringify(poolChainData)]);
 
   return (
     <>

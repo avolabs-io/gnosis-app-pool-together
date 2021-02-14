@@ -28,13 +28,13 @@ export const PoolsChain: React.FC = ({ children }) => {
           ]),
         );
       }
-      Promise.all(reqs).then((values) => {
-        setPoolChainData(
-          values.map((value) => ({
-            secondsRemaining: Number(value),
-          })),
-        );
-      });
+      // Promise.all(reqs).then((values) => {
+      //   setPoolChainData(
+      //     values.map((value) => ({
+      //       secondsRemaining: Number(value),
+      //     })),
+      //   );
+      // });
     })();
   }, [JSON.stringify(pools), sdk]);
 

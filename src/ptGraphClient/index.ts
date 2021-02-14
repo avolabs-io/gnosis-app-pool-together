@@ -2,8 +2,7 @@ import fetch from 'cross-fetch';
 
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
 
-import { POOLS_QUERY, POOLS_BY_ID } from './queries';
-
+import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES } from './queries';
 export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
@@ -51,6 +50,31 @@ export const GetPoolsById = async (ids: string[]) => {
   }
 };
 
+export const GetUserAccountBalances = async (id: string) => {
+  try {
+    const { data } = await ptClient.query({
+      query: USERS_TOKEN_BALANCES,
+      variables: {
+        account: id,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('error');
+    console.log(error);
+    return { error: true, message: error };
+  }
+};
+
+export type UserAccount = {
+  controlledTokenBalances: {
+    controlledToken: {
+      id: string;
+    };
+    balance: string;
+  }[];
+};
+
 type PrizeStrategy =
   | null
   | undefined
@@ -60,10 +84,12 @@ type PrizeStrategy =
       ticket: {
         id: string;
         totalSupply: string;
+        decimals: string;
       };
       sponsorship: {
         id: string;
         totalSupply: string;
+        decimals: string;
       };
     };
 
@@ -78,6 +104,8 @@ export type PoolGraphData = {
   underlyingCollateralSymbol: string;
   underlyingCollateralToken: string;
   compoundPrizePool: CompoundPrizePool;
+  prizePoolType: string;
+  underlyingCollateralDecimals: string;
   id: string;
   prizeStrategy: {
     singleRandomWinner: PrizeStrategy;

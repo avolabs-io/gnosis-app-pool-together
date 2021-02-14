@@ -15,6 +15,7 @@ import PoolCardProps from './PoolCardProps';
 import Countdown from '../Countdown';
 
 import { Heading } from '../GeneralStyled';
+import { useNavigation } from '../../providers/navigation';
 
 const PoolCard: React.FC<PoolCardProps> = ({
   tokenImageUrl,
@@ -22,12 +23,14 @@ const PoolCard: React.FC<PoolCardProps> = ({
   prizeValue,
   secondsRemaining,
   tokenSymbol,
+  poolIndex,
 }: PoolCardProps) => {
   const { fontSize, ref } = useFitText({
     minFontSize: 20,
     maxFontSize: 150,
     resolution: 5,
   });
+  const { setNavigation } = useNavigation();
 
   const [imageUrl, setImageUrl] = useState(`https://gnosis-safe-token-logos.s3.amazonaws.com/${tokenImageUrl}.png`);
 
@@ -60,7 +63,12 @@ const PoolCard: React.FC<PoolCardProps> = ({
         <Heading>Countdown</Heading>
         <Countdown prizeGivingSecondsRemaining={secondsRemaining} />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <Button size="lg" color="primary" variant="contained">
+          <Button
+            size="lg"
+            color="primary"
+            variant="contained"
+            onClick={() => setNavigation({ selectedPage: '1', initiallySelectedPool: poolIndex })}
+          >
             Deposit {tokenSymbol}
           </Button>
         </div>
