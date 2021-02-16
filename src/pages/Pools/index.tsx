@@ -40,11 +40,6 @@ const Pools: React.FC = () => {
           : Date.now(),
       );
     }
-
-    if (pools.length > 0) {
-      console.log('poolChainData');
-      console.log(pools[0].prizeStrategyContract);
-    }
   }, [JSON.stringify(pools), JSON.stringify(ticketBalances), JSON.stringify(poolChainData)]);
 
   return (

@@ -4,8 +4,6 @@ import { useNetworkProvider } from './ethers';
 import { contractAddresses } from '@pooltogether/current-pool-data';
 import { GetPoolsById, PoolGraphData } from '../ptGraphClient';
 import PrizePoolAbi from '@pooltogether/pooltogether-contracts/abis/PrizePool';
-import MultipleWinnersPrizeStrategyAbi from '@pooltogether/pooltogether-contracts/abis/MultipleWinners';
-import SingleRandomWinnerPrizeStrategyAbi from '@pooltogether/pooltogether-contracts/abis/SingleRandomWinner';
 import ERC20Abi from '../abis/erc20';
 import { ethers } from 'ethers';
 
@@ -21,14 +19,14 @@ type PoolData = {
   id: string;
   contract: ethers.Contract;
   underlyingCollateralContract: ethers.Contract;
-  prizeStrategyContract: ethers.Contract;
+  prizeStrategyAddress: string;
   cTokenAddress: undefined | string;
   ticketContract: ethers.Contract;
-  sponsorshipContract: ethers.Contract;
   poolGraphData: PoolGraphData;
   ticketAddress: string;
   ticketSupply: string;
   sponsorshipSupply: string;
+  isMultiple: boolean;
 };
 
 export const PoolsProvider: React.FC = ({ children }) => {
@@ -61,6 +59,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
           sponsorshipDecimals,
           ticketSupply,
           sponsorshipSupply,
+          isMultiple,
         } = getPrizeStrategyAndTokenContracts(result, provider);
 
         return {
@@ -71,7 +70,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
           underlyingCollateralDecimals: result.underlyingCollateralDecimals,
           contract: new ethers.Contract(result.id, PrizePoolAbi, provider),
           underlyingCollateralContract: new ethers.Contract(result.underlyingCollateralToken, ERC20Abi, provider),
-          prizeStrategyContract: prizeStrategy,
+          prizeStrategyAddress: prizeStrategy,
           cTokenAddress: result?.compoundPrizePool?.cToken,
           sponsorshipContract: sponsorship,
           ticketContract: ticket,
@@ -80,7 +79,8 @@ export const PoolsProvider: React.FC = ({ children }) => {
           ticketDecimals,
           sponsorshipDecimals,
           ticketSupply,
-          sponsorshipSupply
+          sponsorshipSupply,
+          isMultiple,
         };
       });
 
@@ -95,8 +95,7 @@ const getPrizeStrategyAndTokenContracts = (result: PoolGraphData, provider: Safe
   if (!!result.prizeStrategy.multipleWinners) {
     return getStrategyVals(result.prizeStrategy.multipleWinners, provider, true);
   } else if (!!result.prizeStrategy.singleRandomWinner) {
-    return getStrategyVals(result.prizeStrategy.singleRandomWinner, provider, true);
-
+    return getStrategyVals(result.prizeStrategy.singleRandomWinner, provider, false);
   }
   throw new Error('No strategy for prize Pool!');
 };
@@ -113,38 +112,24 @@ type StrategyData = {
     totalSupply: string;
     decimals: string;
   };
-}
+};
 
-const getStrategyVals = ({
-  id: strategyAddress,
-  ticket: {
-    id: ticketAddress,
-    totalSupply: ticketSupply,
-    decimals: ticketDecimals
-  },
-  sponsorship: {
-    id: sponsorshipAddress,
-    totalSupply: sponsorshipSupply,
-    decimals: sponsorshipDecimals,
-}} : StrategyData, provider: SafeAppsSdkProvider,isMultiple: boolean) => ({
-  prizeStrategy: new ethers.Contract(
-    strategyAddress,
-    isMultiple ? MultipleWinnersPrizeStrategyAbi : SingleRandomWinnerPrizeStrategyAbi,
-    provider,
-  ),
-  ticket: new ethers.Contract(
-    ticketAddress,
-    ERC20Abi,
-    provider
-  ),
+const getStrategyVals = (
+  {
+    id: strategyAddress,
+    ticket: { id: ticketAddress, totalSupply: ticketSupply, decimals: ticketDecimals },
+    sponsorship: { id: sponsorshipAddress, totalSupply: sponsorshipSupply, decimals: sponsorshipDecimals },
+  }: StrategyData,
+  provider: SafeAppsSdkProvider,
+  isMultiple: boolean,
+) => ({
+  isMultiple,
+  prizeStrategy: strategyAddress,
+  ticket: new ethers.Contract(ticketAddress, ERC20Abi, provider),
   ticketAddress,
   ticketSupply,
   sponsorshipSupply,
-  sponsorship: new ethers.Contract(
-    sponsorshipAddress,
-    ERC20Abi,
-    provider,
-  ),
+  sponsorship: new ethers.Contract(sponsorshipAddress, ERC20Abi, provider),
   ticketDecimals,
   sponsorshipDecimals,
 });
