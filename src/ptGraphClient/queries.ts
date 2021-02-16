@@ -65,6 +65,9 @@ export const POOLS_BY_ID = gql`
           }
         }
       }
+      prizes(orderBy: prizePeriodStartedTimestamp, orderDirection: desc, first: 1){
+        prizePeriodStartedTimestamp
+      } 
     }
   }
 `;
