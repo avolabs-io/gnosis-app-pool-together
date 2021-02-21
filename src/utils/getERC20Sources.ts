@@ -1,10 +1,8 @@
 import { PoolData, erc20Source } from '../providers/pools';
 import { contractAddresses } from '@pooltogether/current-pool-data';
 import { GetLootBoxSources, LootBoxSource } from '../ptGraphClient';
-import { BigNumber } from 'ethers';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const flatten = (a: any[]) => a.reduce((a, b) => a.concat(b), []);
+import { BigNumber, ethers } from 'ethers';
+import { flatten } from './flatten';
 
 export const getExternalErc20Sources = (poolsGraphData: PoolData[]): erc20Source[][] =>
   poolsGraphData.map((x) =>
@@ -42,7 +40,10 @@ export const getLootboxERC20Sources = async (
         const r = results.find((z) => z.tokenId == y);
         if (r && r.erc20Balances) {
           result = result.concat(
-            r.erc20Balances.map((x) => ({ ...x.erc20Entity, balance: BigNumber.from(x.balance) })),
+            r.erc20Balances.map((x) => ({
+              ...x.erc20Entity,
+              balance: BigNumber.from(x.balance),
+            })),
           );
         }
       });

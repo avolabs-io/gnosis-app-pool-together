@@ -10,6 +10,7 @@ import { useNetworkProvider } from './ethers';
 import PrizePoolAbi from '@pooltogether/pooltogether-contracts/abis/PrizePool';
 import { BigNumber, constants, ethers } from 'ethers';
 import { calculateEstimatedPoolPrize } from '../utils/calculateEstimatedPrizePool';
+import { normalizeTo18Decimals } from '../utils/normalizeTo18Decimals';
 
 const PoolsChainContext = createContext<PoolChainData[]>([]);
 
@@ -79,22 +80,25 @@ export const PoolsChainProvider: React.FC = ({ children }) => {
       console.log(
         finalData.map((x, index) => {
           return ethers.utils.formatUnits(
-            calculateEstimatedPoolPrize({
-              tokenDecimals: parseInt(pools[index].ticketDecimals, 10),
-              awardBalance: x.awardBalance,
-              supplyRatePerBlock: x.supplyRatePerBlock,
-              prizePeriodRemainingSeconds: x.secondsRemaining,
-              poolTotalSupply: BigNumber.from(pools[index].ticketSupply).add(
-                BigNumber.from(pools[index].sponsorshipSupply),
+            normalizeTo18Decimals(
+              calculateEstimatedPoolPrize({
+                tokenDecimals: parseInt(pools[index].ticketDecimals, 10),
+                awardBalance: x.awardBalance,
+                supplyRatePerBlock: x.supplyRatePerBlock,
+                prizePeriodRemainingSeconds: x.secondsRemaining,
+                poolTotalSupply: BigNumber.from(pools[index].ticketSupply).add(
+                  BigNumber.from(pools[index].sponsorshipSupply),
+                ),
+              }).mul(
+                ethers.utils.parseUnits(
+                  '1',
+                  parseInt(pools[index].ticketDecimals || '18', 10) -
+                    parseInt(pools[index].underlyingCollateralDecimals || '18', 10),
+                ),
               ),
-            }).mul(
-              ethers.utils.parseUnits(
-                '1',
-                parseInt(pools[index].ticketDecimals || '18', 10) -
-                  parseInt(pools[index].underlyingCollateralDecimals || '18', 10),
-              ),
+              parseInt(pools[index].underlyingCollateralDecimals, 10),
             ),
-            pools[index].ticketDecimals,
+            18,
           );
         }),
       );

@@ -31,6 +31,8 @@ export const PoolsERC20BalanceProvider: React.FC = ({ children }) => {
       lootboxErc20Sources = lootboxErc20Sources.map((x, index) =>
         x.filter((y) => !externalErc20Sources[index].find((z) => z.id == y.id)),
       );
+      // ^ counter-intuitive, but seems like on the PT front-end the
+      // externalErc20 sources take precedence
       const provider = new Provider(baseProvider);
       await provider.init();
       const requests = [];
@@ -55,8 +57,9 @@ export const PoolsERC20BalanceProvider: React.FC = ({ children }) => {
           }
           z++;
         }
-        finalResult.push(resultForPool.concat(lootboxErc20Sources[i]));
+        finalResult.push(resultForPool.concat(lootboxErc20Sources[i].map((x) => ({ ...x, balance: x.balance }))));
       }
+      console.log('FINAL RESULTS');
       console.log(
         finalResult.map((x) =>
           x.map((x) => ({

@@ -10,7 +10,8 @@ import { NavigationProvider } from './providers/navigation';
 import { TicketsProvider } from './providers/tickets';
 import { PoolsChainProvider } from './providers/pools-chain';
 import { PoolsERC20BalanceProvider } from './providers/pools-erc-balance';
-import { EthToUSDProvider } from './providers/eth-to-usd';
+import { ExchangeProvider } from './providers/exchange';
+import { PrizeProvider } from './providers/prize-values';
 
 import GlobalStyle from './GlobalStyle';
 import App from './App';
@@ -33,11 +34,13 @@ ReactDOM.render(
             <TicketsProvider>
               <PoolsChainProvider>
                 <PoolsERC20BalanceProvider>
-                  <EthToUSDProvider>
-                    <NavigationProvider>
-                      <App />
-                    </NavigationProvider>
-                  </EthToUSDProvider>
+                  <ExchangeProvider>
+                    <PrizeProvider>
+                      <NavigationProvider>
+                        <App />
+                      </NavigationProvider>
+                    </PrizeProvider>
+                  </ExchangeProvider>
                 </PoolsERC20BalanceProvider>
               </PoolsChainProvider>
             </TicketsProvider>

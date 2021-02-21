@@ -2,7 +2,7 @@ import fetch from 'cross-fetch';
 
 import { ApolloClient, InMemoryCache, HttpLink, NormalizedCacheObject } from '@apollo/client';
 
-import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES, LOOTBOX_QUERY } from './queries';
+import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES, LOOTBOX_QUERY, TOKENS_QUERY } from './queries';
 export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
@@ -20,6 +20,19 @@ export const setPtClient = (a: ApolloClient<NormalizedCacheObject>): void => {
 export const setLbClient = (a: ApolloClient<NormalizedCacheObject>): void => {
   lbClient = a;
 };
+
+const uniClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2',
+    fetch,
+  }),
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    query: {
+      fetchPolicy: 'no-cache',
+    },
+  },
+});
 
 export const GetPools = async () => {
   try {
@@ -79,6 +92,22 @@ export const GetLootBoxSources = async (lootBoxAddress: string, ids: string[]) =
       variables: {
         tokenIDs: ids,
         lootBoxAddress: lootBoxAddress,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('error');
+    console.log(error);
+    return { error: true, message: error };
+  }
+};
+
+export const GetTokenExchange = async (tokenIDs: string[]) => {
+  try {
+    const { data } = await uniClient.query({
+      query: TOKENS_QUERY,
+      variables: {
+        tokenIDs,
       },
     });
     return data;

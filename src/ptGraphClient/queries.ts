@@ -101,3 +101,14 @@ export const LOOTBOX_QUERY = gql`
     }
   }
 `;
+
+export const TOKENS_QUERY = gql`
+  query GetTokens($tokenIDs: [String!]!) {
+    tokens(where: { id_in: $tokenIDs }) {
+      id
+      derivedETH
+      symbol
+      decimals
+    }
+  }
+`;

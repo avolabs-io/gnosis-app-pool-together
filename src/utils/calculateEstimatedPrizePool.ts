@@ -42,7 +42,5 @@ export function calculateEstimatedPoolPrize({
     .div(ethers.constants.WeiPerEther);
 
   const estimatedPrizeBN = additionalYield.add(awardBalance);
-
-  // denormalize back to original token decimal amount
-  return estimatedPrizeBN.div(ethers.utils.parseUnits('1', 18 - parseInt(decimals.toString(), 10)));
+  return estimatedPrizeBN;
 }
