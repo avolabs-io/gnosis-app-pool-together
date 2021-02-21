@@ -1,21 +1,25 @@
 import fetch from 'cross-fetch';
 
-import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client';
+import { ApolloClient, InMemoryCache, HttpLink, NormalizedCacheObject } from '@apollo/client';
 
-import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES } from './queries';
+import { POOLS_QUERY, POOLS_BY_ID, USERS_TOKEN_BALANCES, LOOTBOX_QUERY } from './queries';
 export const POOLTOGETHER_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 // 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
-// 'https://api.thegraph.com/subgraphs/name/pooltogether/pooltogether-staging-v3_1_0';
+// 'https://api.thegraph.com/subgraphs/name/pooltogether/rinkeby-v3_1_0';
 
-const ptClient = new ApolloClient({
-  link: new HttpLink({ uri: POOLTOGETHER_GRAPH_ENDPOINT, fetch }),
-  cache: new InMemoryCache(),
-  defaultOptions: {
-    query: {
-      fetchPolicy: 'no-cache',
-    },
-  },
-});
+export const LOOTBOX_GRAPH_ENDPOINT = 'https://api.thegraph.com/subgraphs/name/pooltogether/lootbox-v1_0_0';
+
+// eslint-disable-next-line no-var
+let ptClient: ApolloClient<NormalizedCacheObject>;
+
+let lbClient: ApolloClient<NormalizedCacheObject>;
+
+export const setPtClient = (a: ApolloClient<NormalizedCacheObject>): void => {
+  ptClient = a;
+};
+export const setLbClient = (a: ApolloClient<NormalizedCacheObject>): void => {
+  lbClient = a;
+};
 
 export const GetPools = async () => {
   try {
@@ -66,6 +70,40 @@ export const GetUserAccountBalances = async (id: string) => {
   }
 };
 
+export const GetLootBoxSources = async (lootBoxAddress: string, ids: string[]) => {
+  try {
+    console.log(lootBoxAddress);
+    console.log(ids);
+    const { data } = await lbClient.query({
+      query: LOOTBOX_QUERY,
+      variables: {
+        tokenIDs: ids,
+        lootBoxAddress: lootBoxAddress,
+      },
+    });
+    return data;
+  } catch (error) {
+    console.log('error');
+    console.log(error);
+    return { error: true, message: error };
+  }
+};
+
+export type LootBoxSource = {
+  tokenId: string;
+  id: string;
+  erc20Balances: [
+    {
+      balance: string;
+      erc20Entity: {
+        id: string;
+        symbol: string;
+        decimals: string;
+      };
+    },
+  ];
+};
+
 export type UserAccount = {
   controlledTokenBalances: {
     controlledToken: {
@@ -91,6 +129,18 @@ type PrizeStrategy =
         totalSupply: string;
         decimals: string;
       };
+      externalErc721Awards: [
+        {
+          tokenIds: string[];
+        },
+      ];
+      externalErc20Awards: [
+        {
+          decimals: string;
+          id: string;
+          symbol: string;
+        },
+      ];
     };
 
 type CompoundPrizePool =

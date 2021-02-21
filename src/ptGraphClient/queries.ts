@@ -49,6 +49,14 @@ export const POOLS_BY_ID = gql`
             id
             totalSupply
           }
+          externalErc20Awards {
+            id
+            decimals
+            symbol
+          }
+          externalErc721Awards {
+            tokenIds
+          }
         }
         multipleWinners {
           prizePeriodEndAt
@@ -63,11 +71,33 @@ export const POOLS_BY_ID = gql`
             totalSupply
             decimals
           }
+          externalErc20Awards {
+            id
+            decimals
+            symbol
+          }
+          externalErc721Awards {
+            tokenIds
+          }
         }
       }
-      prizes(orderBy: prizePeriodStartedTimestamp, orderDirection: desc, first: 1){
-        prizePeriodStartedTimestamp
-      } 
+    }
+  }
+`;
+
+export const LOOTBOX_QUERY = gql`
+  query GetLootboxes($lootBoxAddress: String!, $tokenIDs: [String!]!) {
+    lootBoxes(where: { tokenId_in: $tokenIDs, erc721: $lootBoxAddress }) {
+      id
+      tokenId
+      erc20Balances {
+        balance
+        erc20Entity {
+          id
+          symbol
+          decimals
+        }
+      }
     }
   }
 `;

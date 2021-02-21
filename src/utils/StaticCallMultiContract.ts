@@ -22,14 +22,14 @@ export class Contract {
     this._address = address;
     this._abi = abi;
 
-    this._functions = abi.filter(x => x.type === 'function');
+    this._functions = abi.filter((x) => x.type === 'function');
     //const callFunctions = this._functions.filter(x => x.stateMutability === 'pure' || x.stateMutability === 'view');
 
     for (const callFunction of this._functions) {
       const { name } = callFunction;
-      if(!name) continue;
+      if (!name) continue;
       const getCall = makeCallFunction(this, name);
-      if(!getCall) continue;
+      if (!getCall) continue;
       if (!this[name]) {
         defineReadOnly(this, name, getCall);
       }
@@ -42,11 +42,11 @@ export class Contract {
 function makeCallFunction(contract: Contract, name: string) {
   return (...params: any[]) => {
     const { address } = contract;
-    const a = contract.functions.find(f => f.name === name);
-    if(!a) return;
+    const a = contract.functions.find((f) => f.name === name);
+    if (!a) return;
     const { inputs } = a;
-    const b = contract.functions.find(f => f.name === name);
-    if(!b) return;
+    const b = contract.functions.find((f) => f.name === name);
+    if (!b) return;
     const { outputs } = b;
     return {
       contract: {

@@ -25,6 +25,7 @@ export const PoolsChainProvider: React.FC = ({ children }) => {
   const pools = usePoolData();
   const [poolChainData, setPoolChainData] = useState<PoolChainData[]>([]);
   useEffect(() => {
+    if (!baseProvider) return;
     if (!pools || pools.length === 0) return;
     if (!connected) return;
 

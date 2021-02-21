@@ -9,7 +9,17 @@ import { ethers } from 'ethers';
 
 const PoolsContext = createContext<PoolData[]>([]);
 
-type PoolData = {
+export type erc20Source = {
+  id: string;
+  decimals: string;
+  symbol: string;
+};
+
+type erc721Source = {
+  tokenIds: string[];
+};
+
+export type PoolData = {
   underlyingCollateralSymbol: string;
   underlyingCollateralToken: string;
   underlyingCollateralDecimals: string;
@@ -27,6 +37,8 @@ type PoolData = {
   ticketSupply: string;
   sponsorshipSupply: string;
   isMultiple: boolean;
+  externalErc721Awards: erc721Source[];
+  externalErc20Awards: erc20Source[];
 };
 
 export const PoolsProvider: React.FC = ({ children }) => {
@@ -34,6 +46,7 @@ export const PoolsProvider: React.FC = ({ children }) => {
   const [poolsData, setPoolsData] = useState<PoolData[]>([]);
 
   useEffect(() => {
+    if (!provider) return;
     (async () => {
       const network = await provider.getNetwork();
       const addresses = contractAddresses[network.chainId.toString()];
@@ -60,6 +73,8 @@ export const PoolsProvider: React.FC = ({ children }) => {
           ticketSupply,
           sponsorshipSupply,
           isMultiple,
+          externalErc721Awards,
+          externalErc20Awards,
         } = getPrizeStrategyAndTokenContracts(result, provider);
 
         return {
@@ -78,6 +93,8 @@ export const PoolsProvider: React.FC = ({ children }) => {
           ticketAddress: ticketAddress,
           ticketDecimals,
           sponsorshipDecimals,
+          externalErc721Awards,
+          externalErc20Awards,
           ticketSupply,
           sponsorshipSupply,
           isMultiple,
@@ -112,6 +129,18 @@ type StrategyData = {
     totalSupply: string;
     decimals: string;
   };
+  externalErc721Awards: [
+    {
+      tokenIds: string[];
+    },
+  ];
+  externalErc20Awards: [
+    {
+      id: string;
+      decimals: string;
+      symbol: string;
+    },
+  ];
 };
 
 const getStrategyVals = (
@@ -119,6 +148,8 @@ const getStrategyVals = (
     id: strategyAddress,
     ticket: { id: ticketAddress, totalSupply: ticketSupply, decimals: ticketDecimals },
     sponsorship: { id: sponsorshipAddress, totalSupply: sponsorshipSupply, decimals: sponsorshipDecimals },
+    externalErc721Awards,
+    externalErc20Awards,
   }: StrategyData,
   provider: SafeAppsSdkProvider,
   isMultiple: boolean,
@@ -132,6 +163,8 @@ const getStrategyVals = (
   sponsorship: new ethers.Contract(sponsorshipAddress, ERC20Abi, provider),
   ticketDecimals,
   sponsorshipDecimals,
+  externalErc721Awards,
+  externalErc20Awards,
 });
 
 export const usePoolData = (): PoolData[] => {
