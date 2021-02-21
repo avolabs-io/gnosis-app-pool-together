@@ -7,10 +7,9 @@ import { useExchange } from './exchange';
 import { useNetworkProvider } from './ethers';
 import { calculateEstimatedPoolPrize } from '../utils/calculateEstimatedPrizePool';
 import { ethers, BigNumber } from 'ethers';
-import { normalizeTo18Decimals } from '../utils/normalizeTo18Decimals';
 import { derivedEthToEthAlreadyNormalized, EthToUsd, derivedEthToEth } from '../utils/conversions';
 
-const EthersContext = createContext<undefined>(undefined);
+const PrizeValContext = createContext<string[]>([]);
 
 export const PrizeProvider: React.FC = ({ children }) => {
   const {
@@ -21,15 +20,13 @@ export const PrizeProvider: React.FC = ({ children }) => {
   const poolsChainData = usePoolChainData();
   const poolsErc20Balance = usePoolsERC20Balance();
   const provider = useNetworkProvider();
+  const [prizes, setPrizes] = useState<string[]>([]);
   useEffect(() => {
     (async () => {
       if (!provider) return;
       // const chainId = (await provider.getNetwork()).chainId;
-      console.log('HEHEHEHEHEHEH');
-      console.log(poolsErc20Balance.length !== pools.length);
-      console.log(!initialized);
       if (poolsErc20Balance.length !== pools.length || !initialized) return;
-      console.log(exchangeDict);
+      const prizeVals = [];
       for (let i = 0; i < pools.length; i++) {
         console.log(pools[i].underlyingCollateralSymbol);
         let poolPrizeEth = derivedEthToEthAlreadyNormalized(
@@ -51,15 +48,25 @@ export const PrizeProvider: React.FC = ({ children }) => {
             exchangeDict[balance.id].derivedEth,
           );
           console.log(ethers.utils.formatEther(newEth));
-          poolPrizeEth = poolPrizeEth.add(
-            derivedEthToEth(balance.balance, exchangeDict[balance.id].decimals, exchangeDict[balance.id].derivedEth),
-          );
+          poolPrizeEth = poolPrizeEth.add(newEth);
         }
-        console.log('///////');
-
-        console.log(ethers.utils.formatUnits(EthToUsd(poolPrizeEth, ethToUsd), 18));
+        prizeVals.push(truncate(ethers.utils.formatUnits(EthToUsd(poolPrizeEth, ethToUsd), 18)));
       }
+      setPrizes(prizeVals);
     })();
   }, [pools, poolsChainData, poolsErc20Balance, provider, exchangeDict, initialized, ethToUsd]);
-  return <EthersContext.Provider value={undefined}>{children}</EthersContext.Provider>;
+  return <PrizeValContext.Provider value={prizes}>{children}</PrizeValContext.Provider>;
+};
+
+export const usePrizeValues = (): string[] => {
+  const context = useContext(PrizeValContext);
+  return context;
+};
+
+const truncate = (str: string): string => {
+  if (str.includes('.')) {
+    const parts = str.split('.');
+    return parts[0];
+  }
+  return str;
 };

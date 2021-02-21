@@ -60,6 +60,7 @@ export const ExchangeProvider: React.FC = ({ children }) => {
   useEffect(() => {
     if (!provider) return;
     (async () => {
+      if (pools.length == 0) return;
       setExchangeDict({
         initialized: false,
         exchangeDict: {},
@@ -70,9 +71,24 @@ export const ExchangeProvider: React.FC = ({ children }) => {
       );
       const ticketIds = sources
         .map((x) => x.id)
-        .concat(pools.map((pool) => pool.underlyingCollateralContract.address.toLowerCase()));
-      const data = await GetTokenExchange(ticketIds);
-      if (!data.tokens) return;
+        .concat(pools.map((pool) => pool.underlyingCollateralContract.address.toLowerCase()))
+        .filter((x, index, arr) => arr.indexOf(x) == index);
+      const requests = [];
+      for (const ticketId of ticketIds) {
+        requests.push(GetTokenExchange(ticketId));
+      }
+      const rData = await Promise.all(requests);
+      // ^ doing it individually cause where: {tokenId_in: array} was really slow
+      // for some reason
+      console.log(rData);
+      const data = rData.reduce(
+        (a, b) => {
+          return {
+            tokens: [...a.tokens, ...b.tokens],
+          };
+        },
+        { tokens: [] },
+      );
       const exchangeDict: ExchangeDict = data.tokens.reduce(
         (a: ExchangeDict, b: { derivedETH: string; id: string; decimals: string }) => {
           a[b.id] = {
@@ -83,6 +99,7 @@ export const ExchangeProvider: React.FC = ({ children }) => {
         },
         {},
       );
+      console.log(exchangeDict);
       setExchangeDict({ initialized: true, exchangeDict });
     })();
   }, [provider, pools]);

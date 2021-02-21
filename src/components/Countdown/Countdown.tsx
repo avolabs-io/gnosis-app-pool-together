@@ -8,10 +8,12 @@ const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
   const [countdownTimer, setCountdownTimer] = useState<number>(prizeGivingSecondsRemaining);
   const [display, setDisplay] = useState<React.ReactNode[]>([]);
 
+  useEffect(() => setCountdownTimer(prizeGivingSecondsRemaining), [JSON.stringify(prizeGivingSecondsRemaining)]);
+
   const [initializedTime, _] = useState(Date.now());
 
   useInterval(() => {
-    setCountdownTimer(countdownTimer - 1);
+    setCountdownTimer(countdownTimer - 1000);
   }, 1000);
 
   useEffect(() => {
@@ -20,7 +22,7 @@ const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
       const time = formatDuration(
         intervalToDuration({
           start: new Date(initializedTime),
-          end: new Date(countdownTimer * 1000),
+          end: new Date(countdownTimer),
         }),
         { delimiter: ', ' },
       );
@@ -29,7 +31,7 @@ const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
       split.map((elem, index) => {
         const num = elem.replace(/\D/g, '');
         const string = elem.match(/[a-zA-Z]+/g);
-
+        if (string && string[0] == 'seconds') return;
         content.push(
           <CountdownDigit key={index} className="countdown-number">
             {num}&ensp;

@@ -102,12 +102,12 @@ export const GetLootBoxSources = async (lootBoxAddress: string, ids: string[]) =
   }
 };
 
-export const GetTokenExchange = async (tokenIDs: string[]) => {
+export const GetTokenExchange = async (tokenID: string) => {
   try {
     const { data } = await uniClient.query({
       query: TOKENS_QUERY,
       variables: {
-        tokenIDs,
+        tokenID,
       },
     });
     return data;

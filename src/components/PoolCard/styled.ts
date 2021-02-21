@@ -47,6 +47,8 @@ export const CountdownColumn = styled.div`
   align-items: center;
   height: 100%;
   justify-content: space-around;
+  min-width: 30%;
+  max-width: 30%;
 `;
 
 export const PrizeText = styled.h1`

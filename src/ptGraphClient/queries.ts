@@ -102,9 +102,11 @@ export const LOOTBOX_QUERY = gql`
   }
 `;
 
+// doing this as an individual query cause where: {id_in} was super slow
+// for some reason
 export const TOKENS_QUERY = gql`
-  query GetTokens($tokenIDs: [String!]!) {
-    tokens(where: { id_in: $tokenIDs }) {
+  query GetToken($tokenID: String!) {
+    tokens(where: { id: $tokenID }) {
       id
       derivedETH
       symbol
