@@ -51,6 +51,9 @@ export const ExchangeProvider: React.FC = ({ children }) => {
       const networkId = (await provider.getNetwork()).chainId;
       if (networkId != 4 && networkId != 1) return;
       const chainLinkContract = new Contract(CHAINLINK_ADDRESSES[networkId], chainlinkAbi, provider);
+      // using chainlink for price of eth to usd which I think is why
+      // we get slightly different pool valuations to PT. look to maybe
+      // using a different oracle going forward.
       chainLinkContract.latestAnswer().then((x: BigNumber) => {
         setEthToUsd(x);
       });

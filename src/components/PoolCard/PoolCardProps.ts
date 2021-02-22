@@ -5,6 +5,7 @@ type PoolCardProps = {
   tokenImageUrl: string;
   userBalance: string;
   secondsRemaining: number;
+  loading: boolean;
 };
 
 export default PoolCardProps;

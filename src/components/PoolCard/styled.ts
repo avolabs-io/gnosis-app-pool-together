@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import media from 'styled-media-query';
 import { Card } from '@gnosis.pm/safe-react-components';
+import { Heading } from '../GeneralStyled';
 
 export const CoinImage = styled.img`
   border-radius: 25px;
@@ -13,6 +14,10 @@ export const CoinImage = styled.img`
   width: 60px;
   height: 60px;
   `}
+`;
+
+export const LoadingText = styled(Heading)`
+  margin: auto 0 auto 0;
 `;
 
 export const CardStyled = styled(Card)`

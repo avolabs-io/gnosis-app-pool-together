@@ -15,7 +15,7 @@ const PT_GRAPH_ENDPOINTS: any = {
 
 const LB_GRAPH_ENDPOINTS: any = {
   '1': 'https://api.thegraph.com/subgraphs/name/pooltogether/lootbox-v1_0_0',
-  '4': 'https://api.thegraph.com/subgraphs/name/pooltogether/lootbox-v1_0_0',
+  '4': 'https://api.thegraph.com/subgraphs/name/pooltogether/ptv3-lootbox-rinkeby-staging',
 };
 
 export const EthersProvider: React.FC = ({ children }) => {

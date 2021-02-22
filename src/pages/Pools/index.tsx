@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PoolCard, { PoolCardProps } from '../../components/PoolCard';
 import { usePoolData } from '../../providers/pools';
 import { ethers } from 'ethers';
@@ -8,6 +8,8 @@ import { useDidMount } from '../../utils/useDidMount';
 import { usePrizeValues } from '../../providers/prize-values';
 const Pools: React.FC = () => {
   const [prizePools, setPrizePools] = useState<PoolCardProps[]>([]);
+
+  const date = useRef(Date.now() as number);
   const pools = usePoolData();
   const { ticketBalances, refreshTicketBalances } = useTicketBalances();
   const poolChainData = usePoolChainData();
@@ -28,22 +30,13 @@ const Pools: React.FC = () => {
           ticketBalances.length < pools.length
             ? '0.0'
             : ethers.utils.formatUnits(ticketBalances[index], x.ticketDecimals || '18'),
-        prizeValue: prizeVals.length < pools.length ? 'LOADING' : prizeVals[index],
+        prizeValue: prizeVals.length < pools.length ? '' : prizeVals[index],
         secondsRemaining:
-          (Date.now() as number) +
+          date.current +
           (poolChainData.length < pools.length ? 0 : poolChainData[index].secondsRemaining.toNumber() * 1000),
+        loading: prizeVals.length < pools.length,
       })),
     );
-
-    if (pools.length > 0) {
-      console.log(
-        pools[0].poolGraphData.prizeStrategy.multipleWinners != null
-          ? pools[0].poolGraphData.prizeStrategy.multipleWinners.prizePeriodEndAt
-          : pools[0].poolGraphData.prizeStrategy.singleRandomWinner
-          ? pools[0].poolGraphData.prizeStrategy.singleRandomWinner.prizePeriodEndAt
-          : Date.now(),
-      );
-    }
   }, [JSON.stringify(pools), JSON.stringify(ticketBalances), JSON.stringify(poolChainData), JSON.stringify(prizeVals)]);
 
   return (

@@ -8,7 +8,9 @@ const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
   const [countdownTimer, setCountdownTimer] = useState<number>(prizeGivingSecondsRemaining);
   const [display, setDisplay] = useState<React.ReactNode[]>([]);
 
-  useEffect(() => setCountdownTimer(prizeGivingSecondsRemaining), [JSON.stringify(prizeGivingSecondsRemaining)]);
+  useEffect(() => {
+    setCountdownTimer(prizeGivingSecondsRemaining);
+  }, [JSON.stringify(prizeGivingSecondsRemaining)]);
 
   const [initializedTime, _] = useState(Date.now());
 
@@ -28,10 +30,29 @@ const Countdown: React.FC<Props> = ({ prizeGivingSecondsRemaining }: Props) => {
       );
       const split = time.split(', ');
 
+      if (initializedTime >= countdownTimer + 1000 || (split.length == 1 && split[0].includes('second'))) {
+        content.push(
+          <CountdownDigit key={0} className="countdown-number">
+            0&ensp;
+          </CountdownDigit>,
+          <CountdownText key={100} className="countdown-text">
+            hours&ensp;
+          </CountdownText>,
+          <CountdownDigit key={1} className="countdown-number">
+            0&ensp;
+          </CountdownDigit>,
+          <CountdownText key={101} className="countdown-text">
+            minutes&ensp;
+          </CountdownText>,
+        );
+        setDisplay(content);
+        return;
+      }
+
       split.map((elem, index) => {
         const num = elem.replace(/\D/g, '');
         const string = elem.match(/[a-zA-Z]+/g);
-        if (string && string[0] == 'seconds') return;
+        if (string && (string[0] == 'seconds' || string[0] == 'second')) return;
         content.push(
           <CountdownDigit key={index} className="countdown-number">
             {num}&ensp;
