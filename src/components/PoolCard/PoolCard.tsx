@@ -10,6 +10,7 @@ import {
   BalanceText,
   PrizeTextContainer,
   CountdownColumn,
+  LoadingText,
 } from './styled';
 import PoolCardProps from './PoolCardProps';
 import Countdown from '../Countdown';
@@ -24,6 +25,7 @@ const PoolCard: React.FC<PoolCardProps> = ({
   secondsRemaining,
   tokenSymbol,
   poolIndex,
+  loading,
 }: PoolCardProps) => {
   const { fontSize, ref } = useFitText({
     minFontSize: 20,
@@ -56,7 +58,8 @@ const PoolCard: React.FC<PoolCardProps> = ({
       <Column>
         <Heading>Prize Value</Heading>
         <PrizeTextContainer>
-          <PrizeText>${prizeValue}</PrizeText>
+          {loading && <LoadingText>LOADING</LoadingText>}
+          {!loading && <PrizeText>${prizeValue}</PrizeText>}
         </PrizeTextContainer>
       </Column>
       <CountdownColumn>

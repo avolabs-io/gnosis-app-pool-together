@@ -6,6 +6,7 @@ export const CountdownContainer = styled.div`
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  margin-bottom: auto;
 `;
 
 export const CountdownDigit = styled.h2`

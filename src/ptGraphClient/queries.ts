@@ -49,6 +49,14 @@ export const POOLS_BY_ID = gql`
             id
             totalSupply
           }
+          externalErc20Awards {
+            id
+            decimals
+            symbol
+          }
+          externalErc721Awards {
+            tokenIds
+          }
         }
         multipleWinners {
           prizePeriodEndAt
@@ -63,8 +71,46 @@ export const POOLS_BY_ID = gql`
             totalSupply
             decimals
           }
+          externalErc20Awards {
+            id
+            decimals
+            symbol
+          }
+          externalErc721Awards {
+            tokenIds
+          }
         }
       }
+    }
+  }
+`;
+
+export const LOOTBOX_QUERY = gql`
+  query GetLootboxes($lootBoxAddress: String!, $tokenIDs: [String!]!) {
+    lootBoxes(where: { tokenId_in: $tokenIDs, erc721: $lootBoxAddress }) {
+      id
+      tokenId
+      erc20Balances {
+        balance
+        erc20Entity {
+          id
+          symbol
+          decimals
+        }
+      }
+    }
+  }
+`;
+
+// doing this as an individual query cause where: {id_in} was super slow
+// for some reason
+export const TOKENS_QUERY = gql`
+  query GetToken($tokenID: String!) {
+    tokens(where: { id: $tokenID }) {
+      id
+      derivedETH
+      symbol
+      decimals
     }
   }
 `;
