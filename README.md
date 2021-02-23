@@ -27,7 +27,7 @@ Then:
 - Go to Safe Multisig web interface
   - [Mainnet](https://app.gnosis-safe.io)
   - [Rinkeby](https://rinkeby.gnosis-safe.io/app)
-- Create your test safe
+- Create your [test safe](https://rinkeby.gnosis-safe.io) 
 - Go to Apps -> Manage Apps -> Add Custom App
 - Paste your localhost URL, default is https://localhost:3000/
 - You should see PoolTogether as a new app
