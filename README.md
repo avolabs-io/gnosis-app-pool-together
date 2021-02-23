@@ -28,6 +28,8 @@ Then:
   - [Mainnet](https://app.gnosis-safe.io)
   - [Rinkeby](https://rinkeby.gnosis-safe.io/app)
 - Create your [test safe](https://rinkeby.gnosis-safe.io) 
+- Install dependencies in repo `yarn`
+- Start local server `yarn start`
 - Go to Apps -> Manage Apps -> Add Custom App
 - Paste your localhost URL, default is https://localhost:3000/
 - You should see PoolTogether as a new app
