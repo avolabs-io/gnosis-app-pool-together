@@ -17,10 +17,6 @@ const Pools: React.FC = () => {
   useDidMount(() => refreshTicketBalances());
 
   useEffect(() => {
-    console.log('HEY!');
-    console.log(poolChainData);
-    console.log(poolChainData.map((x) => x.secondsRemaining.toNumber()));
-    console.log(Date.now());
     setPrizePools(
       pools.map((x, index) => ({
         poolIndex: index.toString(),

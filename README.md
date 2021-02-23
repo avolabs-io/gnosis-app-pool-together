@@ -1,6 +1,16 @@
-# My Safe App
+# PoolTogether Safe App
 
-## Getting Started
+<p align="center"><img src="public/pool-together.png" width="200px"/></p>
+
+This Safe App brings no-loss prize games to [Gnosis Safe](https://gnosis-safe.io/) users by allowing them to use the [PoolTogether](https://docs.pooltogether.com/) protocol.
+
+Read more about Safe Apps [here](https://docs.gnosis.io/safe/docs/sdks_safe_apps/).
+
+## Features
+
+Using this safe app users can buy tickets for community approved prize pools, giving them a chance to win the weekly prize for those pools. They can also withdraw their tickets, and view the current dollar estimate of the prizes.
+
+## Local Development
 
 Install dependencies and start a local dev server.
 
@@ -20,38 +30,31 @@ Then:
 - Create your test safe
 - Go to Apps -> Manage Apps -> Add Custom App
 - Paste your localhost URL, default is https://localhost:3000/
-- You should see Safe App Starter as a new app
-- Develop your app from there
+- You should see PoolTogether as a new app
 
-## Features
+## Supported Networks
 
-Gnosis Safe App Starter combines recommendations described in the following repositories:
-
-- [Safe Apps SDK](https://github.com/gnosis/safe-apps-sdk)
-- [safe-react-components](https://github.com/gnosis/safe-react-components)
-
-You can use the `useSafe` React hook to interact with the Safe Apps SDK
-
-```
-const safe = useSafe();
-console.log(safe.info);
-```
-
-Safe React Components are also integrated and ready to use. [See all components](https://components.gnosis-safe.io/).
+Currently Rinkeby and Mainnet only. We pull in data from the PoolTogether hosted subgraphs for these networks. We use [ethers-multicall](https://github.com/cavanmflynn/ethers-multicall) for batching of RPC calls, so for now any future supported network would need to be one that has a multicall contract deployed to it.
 
 ## Dependencies
 
-### Included
+We use the following dependencies for interacting with Gnosis Safe:
 
-- [`@gnosis.pm/safe-react-components`](https://github.com/gnosis/safe-react-components) (UI components themed for the Safe Multisig interface)
-- [`@rmeissner/safe-apps-react-sdk`](https://github.com/rmeissner/safe-sdks-js/tree/master/safe-apps-react-sdk) (React hook for the Safe Apps SDK)
+- [Safe Apps SDK](https://github.com/gnosis/safe-apps-sdk)
+- [safe-react-components](https://github.com/gnosis/safe-react-components)
+- [safe-app-ethers-provider](https://github.com/gnosis/safe-apps-sdk/tree/master/packages/safe-apps-ethers-provider)
 
-### Recommended
+We use [Apollo](https://github.com/apollographql/apollo-client) for graph queries, and [ethers](https://docs.ethers.io/v5/) for RPC calls.
 
-- [`ethers`](https://github.com/ethers-io/ethers.js) (Library for interacting with Ethereum)
-- [`web3`](https://github.com/ethereum/web3.js/) (Library for interacting with Ethereum)
-- [`@studydefi/money-legos`](https://github.com/studydefi/money-legos) (Library for DeFi interactions)
+On the PoolTogether side we use the following dependencies:
+
+- [current-pool-data](https://github.com/pooltogether/current-pool-data) for a list of community approved pools.
+- [pooltogether-pool-contracts](https://github.com/pooltogether/pooltogether-pool-contracts) for the ABIs for the PoolTogether contracts.
+
+We use [Chainlink](https://docs.chain.link/docs/ethereum-addresses) as our oracle for Eth to Usd prices. We use the Rinkeby and Mainnet oracles.
 
 ### Resources
 
-- https://thegraph.com/explorer/subgraph/pooltogether/pooltogether-staging-v3_1_0
+- PoolTogether [subgraph](https://thegraph.com/explorer/subgraph/pooltogether/pooltogether-staging-v3_1_0)
+- PoolTogether lootbox [subgraph](https://thegraph.com/explorer/subgraph/pooltogether/lootbox-v1_0_0)
+- Uniswap [subgraph](https://thegraph.com/explorer/subgraph/uniswap/uniswap-v2)

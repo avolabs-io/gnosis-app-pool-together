@@ -8,7 +8,6 @@ import { useNetworkProvider } from './ethers';
 import { calculateEstimatedPoolPrize } from '../utils/calculateEstimatedPrizePool';
 import { ethers, BigNumber } from 'ethers';
 import { derivedEthToEthAlreadyNormalized, EthToUsd, derivedEthToEth } from '../utils/conversions';
-import { addEmitHelper } from 'typescript';
 
 const PrizeValContext = createContext<string[]>([]);
 
@@ -28,7 +27,6 @@ export const PrizeProvider: React.FC = ({ children }) => {
       const chainId = (await provider.getNetwork()).chainId;
       if (poolsErc20Balance.length !== pools.length || (!initialized && chainId == 1)) return;
       const prizeVals = [];
-      console.log({ ethToUsd: ethers.utils.formatUnits(ethToUsd, 8) });
       for (let i = 0; i < pools.length; i++) {
         const prizeForPool = calculateEstimatedPoolPrize({
           tokenDecimals: parseInt(pools[i].underlyingCollateralDecimals, 10),
@@ -37,12 +35,8 @@ export const PrizeProvider: React.FC = ({ children }) => {
           prizePeriodRemainingSeconds: poolsChainData[i].secondsRemaining,
           poolTotalSupply: BigNumber.from(pools[i].ticketSupply).add(BigNumber.from(pools[i].sponsorshipSupply)),
         });
-        console.log(pools[i].underlyingCollateralSymbol);
-        console.log('------------------');
         if (chainId == 4) {
-          console.log(ethers.utils.formatEther(prizeForPool));
           prizeVals.push(truncate(ethers.utils.formatEther(prizeForPool)));
-
           // ^ just following PT front-end which seems to do this for rinkeby
           continue;
         }
@@ -52,8 +46,6 @@ export const PrizeProvider: React.FC = ({ children }) => {
         );
         for (const balance of poolsErc20Balance[i]) {
           if (balance.id === '0x8e9934b2f0ea602ca5be89e9274669e896c05ac3') continue; // temporary, daud blacklist
-          console.log(balance.symbol);
-          console.log(ethers.utils.formatUnits(balance.balance, balance.decimals));
           const newEth = derivedEthToEth(
             balance.balance,
             exchangeDict[balance.id].decimals,
@@ -63,7 +55,6 @@ export const PrizeProvider: React.FC = ({ children }) => {
         }
         prizeVals.push(truncate(ethers.utils.formatUnits(EthToUsd(poolPrizeEth, ethToUsd), 18)));
       }
-      console.log('------------------');
       setPrizes(prizeVals);
     })();
   }, [pools, poolsChainData, poolsErc20Balance, provider, exchangeDict, initialized, ethToUsd]);

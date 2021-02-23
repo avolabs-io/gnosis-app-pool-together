@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useSafeAppsSDK } from '@gnosis.pm/safe-apps-react-sdk';
-import { BigNumber, constants, ethers } from 'ethers';
+import { BigNumber, constants } from 'ethers';
 import { useNetworkProvider } from './ethers';
 import { usePoolData } from './pools';
 import { getLootboxERC20Sources, getExternalErc20Sources } from '../utils/getERC20Sources';
@@ -59,15 +59,6 @@ export const PoolsERC20BalanceProvider: React.FC = ({ children }) => {
         }
         finalResult.push(resultForPool.concat(lootboxErc20Sources[i].map((x) => ({ ...x, balance: x.balance }))));
       }
-      console.log('FINAL RESULTS');
-      console.log(
-        finalResult.map((x) =>
-          x.map((x) => ({
-            ...x,
-            balance: ethers.utils.formatUnits(x.balance, x.decimals),
-          })),
-        ),
-      );
       setPoolBalances(finalResult);
     })();
   }, [pools, connected]);

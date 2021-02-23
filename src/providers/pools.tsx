@@ -50,17 +50,12 @@ export const PoolsProvider: React.FC = ({ children }) => {
     (async () => {
       const network = await provider.getNetwork();
       const addresses = contractAddresses[network.chainId.toString()];
-      console.log(network.chainId.toString());
-
-      console.log('Object.keys(addresses)');
-      console.log(Object.keys(addresses));
 
       const poolAddresses = Object.keys(addresses)
         .filter((x) => !!addresses[x].prizePool)
         .map((x) => addresses[x].prizePool.toLowerCase());
       const queryResult = await GetPoolsById(poolAddresses);
       const queryArr: PoolGraphData[] = queryResult.prizePools;
-      console.log(queryResult);
 
       const p = queryArr.map((result) => {
         const {
