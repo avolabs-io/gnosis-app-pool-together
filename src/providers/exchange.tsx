@@ -83,7 +83,6 @@ export const ExchangeProvider: React.FC = ({ children }) => {
       const rData = await Promise.all(requests);
       // ^ doing it individually cause where: {tokenId_in: array} was really slow
       // for some reason
-      console.log(rData);
       const data = rData.reduce(
         (a, b) => {
           return {
@@ -102,7 +101,6 @@ export const ExchangeProvider: React.FC = ({ children }) => {
         },
         {},
       );
-      console.log(exchangeDict);
       setExchangeDict({ initialized: true, exchangeDict });
     })();
   }, [provider, pools]);

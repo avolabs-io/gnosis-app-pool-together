@@ -8,9 +8,7 @@ import { Provider } from 'ethers-multicall';
 import { Contract as StaticCallMultiContract } from '../utils/StaticCallMultiContract';
 import { useNetworkProvider } from './ethers';
 import PrizePoolAbi from '@pooltogether/pooltogether-contracts/abis/PrizePool';
-import { BigNumber, constants, ethers } from 'ethers';
-import { calculateEstimatedPoolPrize } from '../utils/calculateEstimatedPrizePool';
-import { normalizeTo18Decimals } from '../utils/normalizeTo18Decimals';
+import { BigNumber, constants } from 'ethers';
 
 const PoolsChainContext = createContext<PoolChainData[]>([]);
 
@@ -74,34 +72,7 @@ export const PoolsChainProvider: React.FC = ({ children }) => {
         }
         finalData.push({ awardBalance, supplyRatePerBlock, secondsRemaining });
       }
-      console.log(finalData);
       setPoolChainData(finalData);
-      console.log(parseInt(pools[0].ticketDecimals));
-      console.log(
-        finalData.map((x, index) => {
-          return ethers.utils.formatUnits(
-            normalizeTo18Decimals(
-              calculateEstimatedPoolPrize({
-                tokenDecimals: parseInt(pools[index].ticketDecimals, 10),
-                awardBalance: x.awardBalance,
-                supplyRatePerBlock: x.supplyRatePerBlock,
-                prizePeriodRemainingSeconds: x.secondsRemaining,
-                poolTotalSupply: BigNumber.from(pools[index].ticketSupply).add(
-                  BigNumber.from(pools[index].sponsorshipSupply),
-                ),
-              }).mul(
-                ethers.utils.parseUnits(
-                  '1',
-                  parseInt(pools[index].ticketDecimals || '18', 10) -
-                    parseInt(pools[index].underlyingCollateralDecimals || '18', 10),
-                ),
-              ),
-              parseInt(pools[index].underlyingCollateralDecimals, 10),
-            ),
-            18,
-          );
-        }),
-      );
     })();
   }, [connected, pools]);
 
