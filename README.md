@@ -8,7 +8,7 @@ Read more about Safe Apps [here](https://docs.gnosis.io/safe/docs/sdks_safe_apps
 
 ## Features
 
-Using this safe app users can buy tickets for community approved prize pools, giving them a chance to win the weekly prize for those pools. They can also withdraw their tickets, and view the current dollar estimate of the prizes.
+Using this Safe App users can buy tickets for community approved prize pools, giving them a chance to win the weekly prize for those pools. They can also withdraw their tickets, and view the current dollar estimate of the prizes.
 
 ## Local Development
 
